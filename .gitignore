@@ -1,0 +1,26 @@
+# Worktrees
+.worktrees/
+.env
+
+# Dependencies
+node_modules
+.pnpm-store
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# OS
+.DS_Store
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+.worktrees/

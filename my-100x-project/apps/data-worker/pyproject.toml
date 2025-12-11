@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "data-worker"
+version = "0.1.0"
+description = "AI Data Worker"
+authors = ["100x Team"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.100.0"
+uvicorn = "^0.23.0"
+pandas = "^2.0.0"
+pymssql = "^2.2.0"
+sqlalchemy = "^2.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

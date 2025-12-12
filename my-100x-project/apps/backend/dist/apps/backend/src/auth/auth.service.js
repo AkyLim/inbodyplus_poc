@@ -31,6 +31,7 @@ let AuthService = class AuthService {
         return null;
     }
     async login(user) {
+        var _a;
         const payload = { username: user.email, sub: user.id };
         const accessToken = Buffer.from(JSON.stringify(payload)).toString('base64');
         return {
@@ -38,7 +39,7 @@ let AuthService = class AuthService {
             user: {
                 id: user.id,
                 email: user.email,
-                nickname: user.nickname,
+                nickname: (_a = user.name) !== null && _a !== void 0 ? _a : '',
             },
         };
     }

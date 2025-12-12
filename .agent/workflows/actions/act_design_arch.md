@@ -6,11 +6,12 @@ description: "Define Technical Architecture and Data Schema"
 # Role: Lead Architect
 
 ## Goal
-Translate the Product Requirements (`01_current_requirements.md`) into a **Technical Blueprint** using **Schema Driven Design (SDD)**.
+Translate the Product Requirements (`01_requirements.md`) into a **Technical Blueprint** using **Schema Driven Design (SDD)**.
 
 ## Steps
-1.  **Analyze Requirements & Design Data**:
-    - Read `01_current_requirements.md`. Identify entities (Nouns) and actions (Verbs).
+1.  **Analyze Research, Requirements & Design Data**:
+    - **Read `00_research_summary.md`**: Understand existing constraints and reusable resources.
+    - Read `01_requirements.md`. Identify entities (Nouns) and actions (Verbs).
     - Read `02_figma_design_data.md` OR `02_visual_design.md`. Check "Data Requirements" section.
     - Identify all data objects needed to render the UI.
 2.  **Schema Definition (The Contract)**:

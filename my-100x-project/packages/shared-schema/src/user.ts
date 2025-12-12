@@ -30,3 +30,22 @@ export const CreateUserDto = UserSchema.pick({
     marketingConsent: true,
 });
 export type CreateUserDto = z.infer<typeof CreateUserDto>;
+
+export const UserResponseSchema = z.object({
+    id: z.string(), // serialized BigInt
+    loginId: z.string(),
+    email: z.string(),
+    phoneNumber: z.string().nullable().optional(),
+    countryCode: z.string(),
+    profileType: z.string(),
+    gender: z.string(),
+    birthDay: z.string(), // ISO Date string or similar
+    height: z.number(),
+    name: z.string().nullable().optional(),
+    profileImgUrl: z.string().nullable().optional(),
+    createAccountDate: z.string(),
+    recentMeasureDate: z.string().nullable().optional(),
+    recentLoginDate: z.string().nullable().optional(),
+});
+
+export type UserResponse = z.infer<typeof UserResponseSchema>;

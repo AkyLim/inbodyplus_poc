@@ -22,6 +22,13 @@ let UsersController = class UsersController {
     getProfile(req) {
         return req.user;
     }
+    async getByUid(id) {
+        const user = await this.usersService.findById(id);
+        if (!user) {
+            return null;
+        }
+        return Object.assign(Object.assign({}, user), { password: undefined });
+    }
 };
 exports.UsersController = UsersController;
 __decorate([
@@ -31,6 +38,13 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "getProfile", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "getByUid", null);
 exports.UsersController = UsersController = __decorate([
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [users_service_1.UsersService])

@@ -1,6 +1,72 @@
 import { z } from 'zod';
-export declare const GenderSchema: any;
-export declare const UserSchema: any;
+export declare const GenderSchema: z.ZodEnum<["MALE", "FEMALE"]>;
+export declare const UserSchema: z.ZodObject<{
+    id: z.ZodString;
+    email: z.ZodString;
+    password: z.ZodString;
+    nickname: z.ZodString;
+    phoneNumber: z.ZodString;
+    birthdate: z.ZodString;
+    gender: z.ZodEnum<["MALE", "FEMALE"]>;
+    height: z.ZodNumber;
+    marketingConsent: z.ZodDefault<z.ZodBoolean>;
+    createdAt: z.ZodDate;
+    updatedAt: z.ZodDate;
+}, "strip", z.ZodTypeAny, {
+    id?: string;
+    email?: string;
+    password?: string;
+    nickname?: string;
+    phoneNumber?: string;
+    birthdate?: string;
+    gender?: "MALE" | "FEMALE";
+    height?: number;
+    marketingConsent?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
+}, {
+    id?: string;
+    email?: string;
+    password?: string;
+    nickname?: string;
+    phoneNumber?: string;
+    birthdate?: string;
+    gender?: "MALE" | "FEMALE";
+    height?: number;
+    marketingConsent?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
+}>;
 export type User = z.infer<typeof UserSchema>;
-export declare const CreateUserDto: any;
+export declare const CreateUserDto: z.ZodObject<Pick<{
+    id: z.ZodString;
+    email: z.ZodString;
+    password: z.ZodString;
+    nickname: z.ZodString;
+    phoneNumber: z.ZodString;
+    birthdate: z.ZodString;
+    gender: z.ZodEnum<["MALE", "FEMALE"]>;
+    height: z.ZodNumber;
+    marketingConsent: z.ZodDefault<z.ZodBoolean>;
+    createdAt: z.ZodDate;
+    updatedAt: z.ZodDate;
+}, "email" | "password" | "nickname" | "phoneNumber" | "birthdate" | "gender" | "height" | "marketingConsent">, "strip", z.ZodTypeAny, {
+    email?: string;
+    password?: string;
+    nickname?: string;
+    phoneNumber?: string;
+    birthdate?: string;
+    gender?: "MALE" | "FEMALE";
+    height?: number;
+    marketingConsent?: boolean;
+}, {
+    email?: string;
+    password?: string;
+    nickname?: string;
+    phoneNumber?: string;
+    birthdate?: string;
+    gender?: "MALE" | "FEMALE";
+    height?: number;
+    marketingConsent?: boolean;
+}>;
 export type CreateUserDto = z.infer<typeof CreateUserDto>;

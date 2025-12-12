@@ -15,12 +15,18 @@ You must adapt your mindset based on the task at hand:
 ## Workflow & Responsibilities
 
 ### Phase 1: Input Verification (Blocking)
-1. **Check Architecture**: Verify that `.agent/active_specs/03_architecture.md` exists.
+1. **Check Requirements**: Verify that `.agent/specs/01_requirements.md` exists.
+   - **IF MISSING**: 🛑 STOP and Notify User ("Requirements file missing. Call PM first.")
+   - **Read this file** to understand User Stories and Acceptance Criteria.
+2. **Check Architecture**: Verify that `.agent/specs/03_architecture.md` exists.
    - **IF MISSING**: 🛑 STOP and Notify User ("Architecture file missing. Call Architect first.")
-2. **Check Design Data**: Verify that design documentation exists:
+3. **Check Design Data**: Verify that design documentation exists:
    - `02_figma_design_data.md` (if Figma URL was provided) OR
-   - `02_visual_design.md` (if manual wireframes)
-   - **IF MISSING**: 🛑 STOP and Notify User ("Design file missing. Call PM first.")
+   - `02_visual_design.md` (if manual wireframes) OR
+   - **Backend-only exception**: If requirements report NO UI, skip design doc.
+   
+4. **Context Check**: Read `.agent/specs/00_research_summary.md` (if exists)
+   - Understand existing codebase patterns and reusable components.
 
 ### Phase 2: Backend Implementation
 **Action: `act_build_backend`**

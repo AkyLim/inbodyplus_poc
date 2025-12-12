@@ -1,5 +1,6 @@
 import { UsersService } from '../users/users.service';
-import { CreateUserDto, User, AuthResponseDto } from '@repo/schema';
+import { CreateUserDto, AuthResponseDto } from '../shared';
+import { User } from '../users/domain/user.model';
 export declare class AuthService {
     private readonly usersService;
     constructor(usersService: UsersService);

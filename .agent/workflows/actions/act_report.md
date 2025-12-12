@@ -51,25 +51,18 @@ You do not write features; you finalize them.
     > **Body**: Implements [Feature]. Verified with [Test Count] tests.
     > Closes #[Issue Number]
 
-### 4. Worktree Cleanup (The Law of Leaving No Trace)
+### 4. Worktree Cleanup (Automated)
 - **CRITICAL**: Only execute this AFTER a successful push.
-- **Where**: This step is executed from the **Main Project** (not the worktree).
+- **Action**: Remove the worktree to clean up workspace.
+- **Execution**:
+  - Use `run_command` with `Cwd` set to the **Main Project Root** (absolute path or `../..`).
+  - Command: `git worktree remove .worktrees/<feature-name> --force`
+  - (Optional) Delete the branch if merged: `git branch -d feature/<feature-name>`
 
-**Commands**:
 ```bash
-# 1. Close the worktree window/editor first
-
-# 2. Go to main project
-cd /path/to/main/project
-
-# 3. List worktrees to confirm
-git worktree list
-
-# 4. Remove the worktree
-git worktree remove .worktrees/<feature-name>
-
-# 5. (Optional) Delete local branch if not needed
-git branch -d feature/<feature-name>
+# Example
+# Cwd: /Users/username/projects/my-project (NOT .worktrees/...)
+git worktree remove .worktrees/orm-mssql2 --force
 ```
 
 ### 5. Post-Merge Sync (After PR is Merged)

@@ -1,8 +1,8 @@
+import { IRepository } from '../../shared/domain/base.repository';
 import { User } from './user.model';
 
-export interface UserRepository {
-    findById(id: string): Promise<User | null>;
-    // Add other methods as needed later (findByEmail, create, etc.)
+export interface UserRepository extends IRepository<User> {
+    findByEmail(email: string): Promise<User | null>;
 }
 
 export const UserRepository = Symbol('UserRepository'); // Token for DI

@@ -8,39 +8,33 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
-const prisma_service_1 = require("../prisma/prisma.service");
+const user_repository_1 = require("./domain/user.repository");
 let UsersService = class UsersService {
-    constructor(prisma) {
-        this.prisma = prisma;
+    constructor(userRepository) {
+        this.userRepository = userRepository;
     }
-    async findOne(uid) {
-        try {
-            const user = await this.prisma.profile_UserInfo.findUnique({
-                where: { UID: BigInt(uid) },
-            });
-            if (!user) {
-                throw new common_1.NotFoundException(`User with UID ${uid} not found`);
-            }
-            return user;
-        }
-        catch (error) {
-            if (error instanceof SyntaxError) {
-                throw new common_1.NotFoundException(`Invalid UID format`);
-            }
-            throw error;
-        }
+    async create(createUserDto) {
+        return this.userRepository.create(createUserDto);
     }
-    create(createUserDto) { return 'This action adds a new user'; }
-    findAll() { return `This action returns all users`; }
-    update(id, updateUserDto) { return `This action updates a #${id} user`; }
-    remove(id) { return `This action removes a #${id} user`; }
+    async findOne(email) {
+        const user = await this.userRepository.findByEmail(email);
+        return user || undefined;
+    }
+    async findById(id) {
+        const user = await this.userRepository.findById(id);
+        return user || undefined;
+    }
 };
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __param(0, (0, common_1.Inject)(user_repository_1.UserRepository)),
+    __metadata("design:paramtypes", [Object])
 ], UsersService);
 //# sourceMappingURL=users.service.js.map

@@ -1,17 +1,3233 @@
-datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
-}
-
 generator client {
   provider = "prisma-client-js"
 }
 
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String?
-  role      String   @default("USER")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model Achievements_Record {
+  ID                BigInt           @id(map: "PK_Achievements_Record") @default(autoincrement())
+  UID               BigInt
+  AchievementsType  String           @db.NVarChar(100)
+  AchievementsValue String?          @db.NVarChar(150)
+  RecordDateTime    DateTime
+  CreateUTC         DateTime         @default(now(), map: "DEFAULT_Achievements_Record_CreateUTC")
+  Profile_UserInfo  Profile_UserInfo @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_Achievements_Record_Profile_UserInfo")
+}
+
+model Analytics_DailyBodyCompDelta {
+  Id                    Int      @id(map: "PK_Analytics_DailyBodyCompDelta") @default(autoincrement())
+  DATETIMES             DateTime @db.DateTime
+  UserCount             Int
+  TotalDeltaInBodyScore BigInt
+  PlusDeltaInBodyScore  BigInt
+  MinusDeltaInBodyScore BigInt
+  TotalDeltaPBF         Float    @db.Real
+  PlusDeltaPBF          Float    @db.Real
+  MinusDeltaPBF         Float    @db.Real
+  TotalDeltaBFM         Float    @db.Real
+  PlusDeltaBFM          Float    @db.Real
+  MinusDeltaBFM         Float    @db.Real
+  TotalDeltaBFMI        Float    @db.Real
+  PlusDeltaBFMI         Float    @db.Real
+  MinusDeltaBFMI        Float    @db.Real
+  TotalDeltaFFM         Float    @db.Real
+  PlusDeltaFFM          Float    @db.Real
+  MinusDeltaFFM         Float    @db.Real
+  TotalDeltaFFMI        Float    @db.Real
+  PlusDeltaFFMI         Float    @db.Real
+  MinusDeltaFFMI        Float    @db.Real
+  TotalDeltaWT          Float    @db.Real
+  PlusDeltaWT           Float    @db.Real
+  MinusDeltaWT          Float    @db.Real
+  TotalDeltaBMI         Float    @db.Real
+  PlusDeltaBMI          Float    @db.Real
+  MinusDeltaBMI         Float    @db.Real
+  TotalDeltaSMM         Float    @db.Real
+  PlusDeltaSMM          Float    @db.Real
+  MinusDeltaSMM         Float    @db.Real
+  CreateUTC             DateTime @default(now(), map: "DEFAULT_Analytics_DailyBodyCompDelta_CreateUTC") @db.DateTime
+  UpdateUTC             DateTime @default(now(), map: "DEFAULT_Analytics_DailyBodyCompDelta_UpdateUTC") @db.DateTime
+}
+
+model Analytics_DailyClusterBodyTypeSummary {
+  ID                      BigInt    @id(clustered: false, map: "PK_Analytics_DailyClusterBodyTypeSummary") @default(autoincrement())
+  SummaryDate             DateTime  @db.Date
+  Generation              String    @db.NVarChar(50)
+  BodyTypeId              String    @db.NVarChar(50)
+  DailyUserCount          Int
+  MonthlyAccumulatedCount Int
+  MonthlyTotalCount       Int
+  FinalRatio              Decimal?  @db.Decimal(5, 2)
+  CreatedAt               DateTime  @default(dbgenerated("getutcdate()"), map: "DF__Analytics__Creat__43867307")
+  UpdatedAt               DateTime?
+
+  @@unique([SummaryDate, Generation, BodyTypeId], map: "UX_Analytics_DailyClusterBodyTypeSummary_Date_Generation_BodyType")
+  @@index([SummaryDate(sort: Desc), Generation, BodyTypeId], map: "CX_Analytics_DailyClusterBodyTypeSummary", clustered: true)
+  @@index([BodyTypeId], map: "IX_Analytics_DailyClusterBodyTypeSummary_BodyType")
+}
+
+model Analytics_DailyClusterBodyTypeSummaryV4 {
+  ID                      BigInt    @id(clustered: false, map: "PK_Analytics_DailyClusterBodyTypeSummaryV4") @default(autoincrement())
+  SummaryDate             DateTime  @db.Date
+  Generation              String    @db.NVarChar(50)
+  BodyTypeId              String    @db.NVarChar(50)
+  DailyUserCount          Int
+  MonthlyAccumulatedCount Int
+  MonthlyTotalCount       Int
+  FinalRatio              Decimal?  @db.Decimal(5, 2)
+  CreatedAt               DateTime  @default(dbgenerated("getutcdate()"), map: "DF__Analytics__Creat__493F4C5D")
+  UpdatedAt               DateTime?
+
+  @@unique([SummaryDate, Generation, BodyTypeId], map: "UX_Analytics_DailyClusterBodyTypeSummaryV4_Date_Generation_BodyType")
+  @@index([SummaryDate(sort: Desc), Generation, BodyTypeId], map: "CX_Analytics_DailyClusterBodyTypeSummaryV4", clustered: true)
+  @@index([BodyTypeId], map: "IX_Analytics_DailyClusterBodyTypeSummaryV4_BodyType")
+}
+
+model Analytics_DailyClusterSummary {
+  ID                      BigInt    @id(clustered: false, map: "PK_Analytics_DailyClusterSummary") @default(autoincrement())
+  SummaryDate             DateTime  @db.Date
+  Generation              String    @db.NVarChar(50)
+  ClusterId               String    @db.NVarChar(100)
+  BodyTypeId              String    @db.NVarChar(50)
+  DailyUserCount          Int
+  MonthlyAccumulatedCount Int
+  FinalRatio              Decimal?  @db.Decimal(5, 2)
+  CreatedAt               DateTime  @default(dbgenerated("getutcdate()"), map: "DF__Analytics__Creat__2CD817D9")
+  UpdatedAt               DateTime?
+
+  @@unique([SummaryDate, Generation, ClusterId, BodyTypeId], map: "UX_Analytics_DailyClusterSummary_Date_Generation_Cluster_BodyType")
+  @@index([SummaryDate(sort: Desc), Generation, ClusterId, BodyTypeId], map: "CX_Analytics_DailyClusterSummary", clustered: true)
+  @@index([ClusterId], map: "IX_Analytics_DailyClusterSummary_Cluster")
+}
+
+model Analytics_DailyClusterSummaryV4 {
+  ID                      BigInt    @id(clustered: false, map: "PK_Analytics_DailyClusterSummaryV4") @default(autoincrement())
+  SummaryDate             DateTime  @db.Date
+  Generation              String    @db.NVarChar(50)
+  ClusterId               String    @db.NVarChar(100)
+  BodyTypeId              String    @db.NVarChar(50)
+  DailyUserCount          Int
+  MonthlyAccumulatedCount Int
+  FinalRatio              Decimal?  @db.Decimal(5, 2)
+  CreatedAt               DateTime  @default(dbgenerated("getutcdate()"), map: "DF__Analytics__Creat__4C1BB908")
+  UpdatedAt               DateTime?
+
+  @@unique([SummaryDate, Generation, ClusterId, BodyTypeId], map: "UX_Analytics_DailyClusterSummaryV4_Date_Generation_Cluster_BodyType")
+  @@index([SummaryDate(sort: Desc), Generation, ClusterId, BodyTypeId], map: "CX_Analytics_DailyClusterSummaryV4", clustered: true)
+  @@index([ClusterId], map: "IX_Analytics_DailyClusterSummaryV4_Cluster")
+}
+
+model Analytics_DailyRanking {
+  RankingDate     DateTime @db.Date
+  UID             BigInt
+  DataInsertDate  DateTime @db.DateTime
+  Equip           String   @db.NVarChar(100)
+  Gender          String   @db.NChar(1)
+  Age             Int
+  SMMPercentile   Float?
+  PBFPercentile   Float?
+  SMM             Float
+  PBF             Float
+  BMI             Float
+  WT              Float
+  InBodyScore     Float    @default(0, map: "DF__Analytics__InBod__47AC09A6")
+  Name            String   @db.NVarChar(100)
+  BirthDay        DateTime @db.Date
+  Height          Float
+  ProfileImgUrl   String   @db.NVarChar(500)
+  AgeLevel        String   @db.NVarChar(20)
+  ClusterId       String?  @db.NVarChar(50)
+  ClusterName     String?  @db.NVarChar(200)
+  BodyTypeName    String?  @db.NVarChar(100)
+  BodyClass       String?  @db.NVarChar(100)
+  RepresentColor  String?  @db.NVarChar(20)
+  UserType        String   @default("", map: "DF__Analytics__UserT__48A02DDF") @db.NVarChar(20)
+  SyncDateTime    DateTime @db.DateTime
+  CreateUtc       DateTime @default(dbgenerated("getutcdate()"), map: "DF__Analytics__Creat__49945218") @db.DateTime
+  UpdateUtc       DateTime @default(dbgenerated("getutcdate()"), map: "DF__Analytics__Updat__4A887651") @db.DateTime
+  IsOutlier       Boolean  @default(false, map: "DF__Analytics__IsOut__4C70BEC3")
+  OutlierReason   String?  @db.NVarChar(200)
+  MeasureDateTime DateTime @db.DateTime
+
+  @@id([RankingDate, UID], map: "PK_Analytics_DailyRanking")
+  @@unique([DataInsertDate, UID], map: "UQ_Analytics_DailyRanking_Measure")
+  @@index([UID, RankingDate(sort: Desc)], map: "IX_Analytics_DailyRanking_UID")
+}
+
+model Analytics_MonthlyClusterTransition {
+  Id                 Int      @id(clustered: false, map: "PK_Analytics_MonthlyClusterTransition") @default(autoincrement())
+  DeclareDateTime    DateTime
+  CurrentClusterId   String   @db.NVarChar(50)
+  PreviousClusterId  String?  @db.NVarChar(50)
+  CurrentBodyClass   String   @db.NVarChar(50)
+  PreviousBodyClass  String?  @db.NVarChar(50)
+  CurrentBodyTypeId  String   @db.NVarChar(50)
+  PreviousBodyTypeId String?  @db.NVarChar(50)
+  TransitionCount    Int
+  Generation         String   @db.NVarChar(20)
+  CreatedAt          DateTime @default(dbgenerated("getutcdate()"), map: "DF__Analytics__Creat__39FD08CD")
+  UpdatedAt          DateTime @default(dbgenerated("getutcdate()"), map: "DF__Analytics__Updat__3AF12D06")
+
+  @@unique([DeclareDateTime, Generation, CurrentClusterId, PreviousClusterId], map: "UQ_Analytics_MonthlyClusterTransition_ClusterTransition", clustered: true)
+  @@index([DeclareDateTime, Generation, CurrentBodyTypeId, PreviousBodyTypeId], map: "IX_Analytics_MonthlyClusterTransition_BodyType")
+  @@index([DeclareDateTime, Generation], map: "IX_Analytics_MonthlyClusterTransition_DateRange")
+}
+
+model Analytics_MonthlyClusterTransitionV4 {
+  Id                 Int      @id(clustered: false, map: "PK_Analytics_MonthlyClusterTransitionV4") @default(autoincrement())
+  DeclareDateTime    DateTime
+  CurrentClusterId   String   @db.NVarChar(50)
+  PreviousClusterId  String?  @db.NVarChar(50)
+  CurrentBodyClass   String   @db.NVarChar(50)
+  PreviousBodyClass  String?  @db.NVarChar(50)
+  CurrentBodyTypeId  String   @db.NVarChar(50)
+  PreviousBodyTypeId String?  @db.NVarChar(50)
+  TransitionCount    Int
+  Generation         String   @db.NVarChar(20)
+  CreatedAt          DateTime @default(dbgenerated("getutcdate()"), map: "DF__Analytics__Creat__4FEC49EC")
+  UpdatedAt          DateTime @default(dbgenerated("getutcdate()"), map: "DF__Analytics__Updat__50E06E25")
+
+  @@unique([DeclareDateTime, Generation, CurrentClusterId, PreviousClusterId], map: "UQ_Analytics_MonthlyClusterTransitionV4_ClusterTransition", clustered: true)
+  @@index([DeclareDateTime, Generation, CurrentBodyTypeId, PreviousBodyTypeId], map: "IX_Analytics_MonthlyClusterTransitionV4_BodyType")
+  @@index([DeclareDateTime, Generation], map: "IX_Analytics_MonthlyClusterTransitionV4_DateRange")
+}
+
+model Article_CategoryInfo {
+  CategoryID            Int                @id(map: "PK_Article_CategoryInfo")
+  CategoryName          String             @db.NVarChar(100)
+  Thumbnail_URL         String?            @db.NVarChar(100)
+  Article_thumbnail_URL String?            @db.NVarChar(100)
+  TextColor             String?            @db.NVarChar(50)
+  BackgroundColor       String?            @db.NVarChar(50)
+  Article_MainInfo      Article_MainInfo[]
+}
+
+model Article_ContentsBlockInfo {
+  ArticleID  Int
+  BlockIndex Int
+  BlockType  String   @db.NVarChar(50)
+  Contents   String?  @db.NVarChar(Max)
+  CreateUTC  DateTime @default(now(), map: "DF_Article_ContentsBlockInfo_CreateUTC") @db.DateTime
+  UpdateUTC  DateTime @default(now(), map: "DF_Article_ContentsBlockInfo_UpdateUTC") @db.DateTime
+
+  @@id([ArticleID, BlockIndex], map: "PK_Article_ContentsBlockInfo")
+}
+
+model Article_ImpressionReachInfo {
+  UID              BigInt
+  ArticleID        Int
+  ImpressionType   String           @db.NVarChar(50)
+  ImpressionDate   DateTime         @db.DateTime
+  ImpressionCount  Int
+  ReachCount       Int
+  CreateUTC        DateTime         @default(now(), map: "DF_Article_ImpressionReachInfo_CreateUTC") @db.DateTime
+  ModifyUTC        DateTime         @default(now(), map: "DF_Article_ImpressionReachInfo_ModifyUTC") @db.DateTime
+  Article_MainInfo Article_MainInfo @relation(fields: [ArticleID], references: [ArticleID], onDelete: Cascade, map: "FK_Article_ImpressionReachInfo_Article_MainInfo")
+  Profile_UserInfo Profile_UserInfo @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_Article_ImpressionReachInfo_Profile_UserInfo")
+
+  @@id([UID, ArticleID, ImpressionType], map: "PK_Article_Impression&ReachInfo")
+}
+
+model Article_MainInfo {
+  ArticleID                   Int                           @id(map: "PK_Article_Main_Info")
+  Category                    String                        @db.NVarChar(200)
+  SubCategoryID               Int
+  Title                       String                        @db.NVarChar(200)
+  Thumbnail_URL               String                        @db.NVarChar(200)
+  NextArticleID               Int
+  NextArticleClickCount       Int                           @default(0, map: "DF_Article_MainInfo_NextArticleClickCount")
+  GoodCount                   Int                           @default(0, map: "DF_Article_Main_Info_GootCount")
+  ReadCount                   Int                           @default(0, map: "DF_Article_Main_Info_ReadCount")
+  Priority                    Int?
+  isDistributed               Boolean                       @default(false, map: "DF_Article_MainInfo_isRelease")
+  IsShownAtDashboard          Boolean                       @default(false, map: "DEFAULT_Article_MainInfo_IsShownAtDashboard")
+  AdditionalProperties        String?                       @db.NVarChar(Max)
+  CreateUTC                   DateTime                      @default(dbgenerated("getutcdate()"), map: "DF_Article_Main_Info_CreateUTC") @db.DateTime
+  UpdateUTC                   DateTime                      @default(dbgenerated("getutcdate()"), map: "DF_Article_Main_Info_UpdateUTC") @db.DateTime
+  Article_ImpressionReachInfo Article_ImpressionReachInfo[]
+  Article_CategoryInfo        Article_CategoryInfo          @relation(fields: [SubCategoryID], references: [CategoryID], onDelete: Cascade, map: "FK_Article_MainInfo_Article_CategoryInfo")
+  Article_Onboarding          Article_Onboarding[]
+  Article_UserLoggingInfo     Article_UserLoggingInfo[]
+}
+
+model Article_Onboarding {
+  DayNumber                  Int                          @id(map: "PK_Article_Onboarding") @unique(map: "UQ__Article___12FD765FF2A17B4A")
+  ArticleID                  Int?
+  Title                      String                       @db.NVarChar(100)
+  Comment                    String                       @db.NVarChar(250)
+  CreateUTC                  DateTime                     @default(now(), map: "DF_Article_Onboarding_CreateUTC") @db.DateTime
+  UpdateUTC                  DateTime                     @default(now(), map: "DF_Article_Onboarding_UpdateUTC") @db.DateTime
+  TextColor                  String                       @default("#FFFFFF", map: "DF__Article_O__TextC__2950D461") @db.NVarChar(50)
+  Article_MainInfo           Article_MainInfo?            @relation(fields: [ArticleID], references: [ArticleID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Article_Onboarding_Article_MainInfo")
+  Article_OnboardingUserInfo Article_OnboardingUserInfo[]
+}
+
+model Article_OnboardingUserInfo {
+  UID                   BigInt             @id(map: "PK_Article_OnboardingUserInfo")
+  DayNumber             Int
+  ThisDayStartDateTime  DateTime           @db.DateTime
+  IsOnboardingCompleted Boolean            @default(false, map: "DF_Article_OnboardingUserInfo_IsOnboardingRead")
+  CreateUTC             DateTime           @default(dbgenerated("getutcdate()"), map: "DF_Article_OnboardingUserInfo_CreateUTC") @db.DateTime
+  UpdateUTC             DateTime           @default(dbgenerated("getutcdate()"), map: "DF_Article_OnboardingUserInfo_UpdateUTC") @db.DateTime
+  ThisDayReadDateTime   DateTime?          @db.DateTime
+  Article_Onboarding    Article_Onboarding @relation(fields: [DayNumber], references: [DayNumber], onDelete: Cascade, map: "FK_Article_OnboardingUserInfo_Article_Onboarding")
+  Profile_UserInfo      Profile_UserInfo   @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_Article_OnboardingUserInfo_Profile_UserInfo")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Article_ThemeGroupInfo {
+  ThemeID    Int
+  GroupIndex Int
+  GroupTitle String   @db.NVarChar(Max)
+  CreateUTC  DateTime @default(now(), map: "DF_Article_ThemeGroupInfo_CreateUTC") @db.DateTime
+  UpdateUTC  DateTime @default(now(), map: "DF_Article_ThemeGroupInfo_UpdateUTC") @db.DateTime
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Article_ThemeInfo {
+  ThemeID              Int
+  ThemeTitle           String   @db.NVarChar(50)
+  ThemeSubTitle        String?  @db.NVarChar(Max)
+  ThemeFontColor       String   @db.NVarChar(50)
+  ThemeBackgroundColor String   @db.NVarChar(50)
+  ThemeImage           String   @db.NVarChar(50)
+  NextThemeID          Int?
+  ThemeArticleID       Int?
+  SortNumber           Int?
+  CreateUTC            DateTime @default(now(), map: "DF_Article_ThemeInfo_CreateUTC") @db.DateTime
+  UpdateUTC            DateTime @default(now(), map: "DF_Article_ThemeInfo_UpdateUTC") @db.DateTime
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Article_ThemeRelationInfo {
+  ThemeID       Int
+  GroupIndex    Int
+  ArticleID     Int
+  ArticleIndex  Int
+  isMainArticle Boolean
+  CreateUTC     DateTime @default(now(), map: "DF_Article_ThemeRelationInfo_CreateUTC") @db.DateTime
+  UpdateUTC     DateTime @default(now(), map: "DF_Article_ThemeRelationInfo_UpdateUTC") @db.DateTime
+
+  @@ignore
+}
+
+model Article_UserLoggingInfo {
+  UID              BigInt
+  ArticleID        Int
+  isGood           Boolean          @default(false, map: "DF_Article_UserLoggingInfo_isGood")
+  ReadCount        Int              @default(0, map: "DF_Article_UserLoggingInfo_ReadCount")
+  CreateUTC        DateTime         @default(dbgenerated("getutcdate()"), map: "DF_Article_UserLoggingInfo_CreateUTC") @db.DateTime
+  UpdateUTC        DateTime         @default(dbgenerated("getutcdate()"), map: "DF_Article_UserLoggingInfo_UpdateUTC") @db.DateTime
+  Article_MainInfo Article_MainInfo @relation(fields: [ArticleID], references: [ArticleID], onDelete: Cascade, map: "FK_Article_UserLoggingInfo_Article_MainInfo")
+  Profile_UserInfo Profile_UserInfo @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_Article_UserLoggingInfo_Profile_UserInfo")
+
+  @@id([UID, ArticleID], map: "PK_Article_UserLoggingInfo")
+}
+
+model Article_UserQuestionInfo {
+  UID              BigInt
+  Question         String           @db.NVarChar(Max)
+  CreateUTC        DateTime         @default(now(), map: "DF_Article_UserQuestionInfo_CreateUTC") @db.DateTime
+  ModifyUTC        DateTime         @default(now(), map: "DF_Article_UserQuestionInfo_ModifyUTC") @db.DateTime
+  Profile_UserInfo Profile_UserInfo @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_Article_UserQuestionInfo_Profile_UserInfo")
+
+  @@id([UID, CreateUTC], map: "PK_Article_UserQuestionInfo")
+}
+
+model BackOffice_AppReview {
+  ID                String   @id(map: "PK_BackOffice_AppReview") @db.NVarChar(70)
+  ReviewerName      String?  @db.NVarChar(100)
+  Title             String?  @db.NVarChar(Max)
+  Body              String   @db.NVarChar(Max)
+  Rating            Int
+  OS                String   @db.NVarChar(10)
+  ReviewCreatedDate DateTime @db.DateTime
+  CreateUTC         DateTime @default(dbgenerated("getutcdate()"), map: "DEFAULT_BackOffice_AppReview_CreateUTC") @db.DateTime
+}
+
+model BackOffice_LogInfo {
+  ID             BigInt   @id(map: "PK_BackOffice_LogInfo") @default(autoincrement())
+  UID            BigInt
+  ApiName        String   @db.NVarChar(200)
+  HttpStatusCode String   @db.NVarChar(100)
+  ErrorMsg       String?  @db.NVarChar(200)
+  IpAddress      String   @db.NVarChar(50)
+  LogDateTime    DateTime @default(now(), map: "DEFAULT_BackOffice_LogInfo_LogDateTime") @db.DateTime
+  CreateUTC      DateTime @default(now(), map: "DEFAULT_BackOffice_LogInfo_CreateUTC") @db.DateTime
+}
+
+model BackOffice_PushMessageInfo {
+  ID                         BigInt                      @id(map: "PK_BackOffice_PushMessageInfo") @default(autoincrement())
+  Type                       String                      @db.NVarChar(50)
+  PublicNotificationID       BigInt?
+  Receivers                  String                      @db.NVarChar(Max)
+  NotificateDate             DateTime                    @db.DateTime
+  IsCanceled                 Boolean                     @default(false, map: "DEFAULT_BackOffice_PushMessageInfo_IsSent")
+  CreateUTC                  DateTime                    @default(dbgenerated("getutcdate()"), map: "DEFAULT_BackOffice_PushMessageInfo_CreateUTC") @db.DateTime
+  Notification_PublicHistory Notification_PublicHistory? @relation(fields: [PublicNotificationID], references: [NotificationID], onDelete: NoAction, onUpdate: NoAction, map: "FK_BackOffice_PushMessageInfo_Notification_PublicHistory")
+}
+
+model BackOffice_SegmentInfo {
+  ID                              BigInt                            @id(map: "PK_BackOffice_SegmentInfo") @default(autoincrement())
+  Name                            String                            @db.NVarChar(250)
+  LogicOperator                   String                            @db.NVarChar(25)
+  SubConditionsJson               String                            @db.NVarChar(Max)
+  CreatedByUID                    BigInt
+  Memo                            String?                           @db.NVarChar(Max)
+  CreateDateTime                  DateTime                          @default(dbgenerated("getutcdate()"), map: "DEFAULT_BackOffice_SegmentInfo_CreateDateTime") @db.DateTime
+  LastUsedDateTime                DateTime                          @default(dbgenerated("getutcdate()"), map: "DEFAULT_BackOffice_SegmentInfo_LastUsedDateTime") @db.DateTime
+  Profile_UserInfo                Profile_UserInfo                  @relation(fields: [CreatedByUID], references: [UID], onUpdate: NoAction, map: "FK_BackOffice_SegmentInfo_Profile_UserInfo")
+  Insight_RecommendArticleSetInfo Insight_RecommendArticleSetInfo[]
+}
+
+model BackOffice_SequenceData {
+  RecordDate DateTime @db.Date
+  Type       String   @db.NVarChar(200)
+  Value      Float    @db.Real
+  CreateUTC  DateTime @default(dbgenerated("getutcdate()"), map: "DEFAULT_BackOffice_SequenceData_CreateUTC") @db.DateTime
+
+  @@id([RecordDate, Type], map: "PK_BackOffice_SequenceData")
+}
+
+model Beta_ClusterAndServiceJoin {
+  ClusterID String @db.NVarChar(30)
+  ServiceID Int
+
+  @@id([ClusterID, ServiceID], map: "PK_Beta_ClusterAndServiceJoin")
+}
+
+model Beta_ServiceInfo {
+  ServiceID         Int      @id(map: "PK_Beta_ServiceInfo")
+  ServiceName       String   @db.NVarChar(Max)
+  ServiceKorName    String?  @db.NVarChar(200)
+  TargetType        String   @db.NVarChar(10)
+  IsActive          Boolean
+  DefaultUsingState Boolean  @default(false, map: "DEFAULT_Beta_ServiceInfo_DefaultUsingState")
+  HasNewLogo        Boolean  @default(false, map: "DEFAULT_Beta_ServiceInfo_HasNewLogo")
+  StartDatetime     DateTime @db.DateTime
+  EndDatetime       DateTime @db.DateTime
+}
+
+model Beta_UIDAndServiceJoin {
+  UID               BigInt
+  ServiceID         Int
+  AgreementContents String? @db.NVarChar(Max)
+  IsAgree           Boolean @default(false, map: "DEFAULT_Beta_UIDAndServiceJoin_IsAgree")
+  IsUsing           Boolean @default(false, map: "DEFAULT_Beta_UIDAndServiceJoin_IsUsing")
+
+  @@id([UID, ServiceID], map: "PK_Beta_UIDAndServiceJoin")
+}
+
+model BigData_DiffusionLine_AxesAndLegendChoiceInfo {
+  SelectedKey        String   @id(map: "PK_BigData_DiffusionLine_AxesAndLegendChoiceInfo") @db.NVarChar(50)
+  ButtonText         String   @db.NVarChar(50)
+  AvailableForX      Boolean
+  AvailableForY      Boolean
+  AvailableForLegend Boolean
+  CreateUTC          DateTime @default(now(), map: "DF_BigData_TrendLine_SelectableColumn_CreateUTC") @db.DateTime
+  UpdateUTC          DateTime @default(now(), map: "DF_BigData_TrendLine_SelectableColumn_UpdateUTC") @db.DateTime
+  NeedToShow         Boolean  @default(false, map: "DF__BigData_D__NeedT__3E2CC10D")
+}
+
+model BigData_DiffusionLine_Filter {
+  FilterType                             String                                   @id(map: "PK_BigData_DiffusionLine_FilterMainInfo") @db.NVarChar(100)
+  FilterCategoryEnum                     String                                   @db.NVarChar(100)
+  Question                               String                                   @db.NVarChar(200)
+  ThumbnailURL                           String                                   @db.NVarChar(300)
+  NeedToShow                             Boolean                                  @default(false, map: "DF__BigData_D__NeedT__3F20E546")
+  BigData_DiffusionLine_FilterChoiceInfo BigData_DiffusionLine_FilterChoiceInfo[]
+}
+
+model BigData_DiffusionLine_FilterAndChoiceCombinationRecommended {
+  Xaxis             String   @db.NVarChar(50)
+  Yaxis             String   @db.NVarChar(50)
+  Legend            String   @db.NVarChar(50)
+  IsSameEnd         Boolean
+  IsFilterGender    Boolean
+  BodyCompType      String   @db.NVarChar(50)
+  IsFilterCluster   Boolean
+  IsInBodyPlusStart Boolean
+  Priority          Int      @default(-1, map: "DF_BigData_DiffusionLine_FilterAndChoiceCombinationRecommended_Priority")
+  ReadCount         Int      @default(0, map: "DF__BigData_D__ReadC__6AEA58EB")
+  DescriptionText   String   @db.NVarChar(200)
+  CreateUTC         DateTime @default(dbgenerated("getutcdate()"), map: "DF__BigData_D__Creat__6BDE7D24") @db.DateTime
+  UpdateUTC         DateTime @default(dbgenerated("getutcdate()"), map: "DF__BigData_D__Updat__6CD2A15D") @db.DateTime
+
+  @@id([Xaxis, Yaxis, Legend, IsSameEnd, IsFilterGender, BodyCompType, IsFilterCluster, IsInBodyPlusStart], map: "PK_BigData_DiffusionLine_FilterAndChoiceCombinationRecommended")
+}
+
+model BigData_DiffusionLine_FilterChoiceInfo {
+  DisplayText                  String                       @db.NVarChar(50)
+  ButtonWidth                  String                       @db.NVarChar(50)
+  SelectedKey                  String                       @db.NVarChar(200)
+  CreateUTC                    DateTime                     @default(now(), map: "DF_BigData_TrendLine_FilterChoiceInfo_CreateUTC") @db.DateTime
+  UpdateUTC                    DateTime                     @default(now(), map: "DF_BigData_TrendLine_FilterChoiceInfo_UpdateUTC") @db.DateTime
+  LegendColor                  String?                      @db.NVarChar(50)
+  FilterType                   String                       @db.NVarChar(100)
+  Priority                     Int                          @default(-1, map: "DF__BigData_D__Prior__4D39FA73")
+  BigData_DiffusionLine_Filter BigData_DiffusionLine_Filter @relation(fields: [FilterType], references: [FilterType], onDelete: Cascade, map: "FK_BigData_DiffusionLine_FilterChoiceInfo_DiffusionLine_Filter")
+
+  @@id([FilterType, SelectedKey], map: "PK_BigData_TrendLine_FilterChoiceInfo")
+}
+
+model BigData_ErrorCaseInfo {
+  UpdateType String   @db.NVarChar(50)
+  UID        BigInt
+  DATETIMES  DateTime @db.DateTime
+  CreateUTC  DateTime @default(now(), map: "DF_BigData_ErrorCaseInfo_CreateUTC") @db.DateTime
+  UpdateUTC  DateTime @default(now(), map: "DF_BigData_ErrorCaseInfo_UpdateUTC") @db.DateTime
+
+  @@id([UpdateType, UID, DATETIMES, CreateUTC], map: "PK_BigData_ErrorCaseInfo")
+}
+
+model BigData_GrowthCurveInfo {
+  Gender    String @db.Char(10)
+  Bodycomp  String @db.Char(10)
+  Month     Int
+  L         Float  @db.Real
+  M         Float  @db.Real
+  S         Float  @db.Real
+  Percent1  Float  @db.Real
+  Percent3  Float  @db.Real
+  Percent5  Float  @db.Real
+  Percent10 Float  @db.Real
+  Percent15 Float  @db.Real
+  Percent25 Float  @db.Real
+  Percent50 Float  @db.Real
+  Percent75 Float  @db.Real
+  Percent85 Float  @db.Real
+  Percent90 Float  @db.Real
+  Percent95 Float  @db.Real
+  Percent97 Float  @db.Real
+  Percent99 Float  @db.Real
+  Minus3SD  Float  @db.Real
+  Minus2SD  Float  @db.Real
+  Minus1SD  Float  @db.Real
+  ZeroSD    Float  @db.Real
+  Plus1SD   Float  @db.Real
+  Plus2SD   Float  @db.Real
+  Plus3SD   Float  @db.Real
+
+  @@id([Gender, Bodycomp, Month], map: "PK_BigData_GrowthCurveInfo")
+}
+
+model BigData_GrowthHistogramInfo {
+  Gender       String @db.Char(10)
+  Month        Int
+  hist_index   Int
+  WT_under_val Float
+  WT_upper_val Float
+  WT_count     Int
+  HT_under_val Float
+  HT_upper_val Float
+  HT_count     Int
+
+  @@id([Gender, Month, hist_index], map: "PK_BigData_GrowthInfo")
+}
+
+model BigData_Histogram_InteractiveLegendsInfo {
+  OrderingID       Int
+  BodyComp         String   @db.NVarChar(50)
+  Title            String   @db.NVarChar(50)
+  ValueCategory    String   @db.NVarChar(50)
+  UnderValue       Float    @db.Real
+  UpperValue       Float    @db.Real
+  Color            String   @db.NVarChar(50)
+  DescriptionTitle String   @db.NVarChar(50)
+  DescriptionBody  String   @db.NVarChar(Max)
+  CreateUTC        DateTime @default(now(), map: "DF_BigData_Histogram_InteractiveLegendsInfo_CreateUTC") @db.DateTime
+  UpdateUTC        DateTime @default(now(), map: "DF_BigData_Histogram_InteractiveLegendsInfo_UpdateUTC") @db.DateTime
+
+  @@id([BodyComp, Title], map: "PK_BigData_Histogram_InteractiveLegendsInfo")
+}
+
+model BigData_HistogramInfo {
+  Gender        String    @db.Char(10)
+  Age           Int
+  HT            Float
+  WT            Float
+  hist_index    Int
+  WT_under_val  Float
+  WT_upper_val  Float
+  WT_count      Float
+  HT_under_val  Float
+  HT_upper_val  Float
+  HT_count      Float
+  SMM_under_val Float
+  SMM_upper_val Float
+  SMM_count     Int
+  PBF_under_val Float
+  PBF_upper_val Float
+  PBF_count     Int
+  BMI_under_val Float
+  BMI_upper_val Float
+  BMI_count     Int
+  BFM_under_val Float
+  BFM_upper_val Float
+  BFM_count     Int
+  WHR_under_val Float
+  WHR_upper_val Float
+  WHR_count     Int
+  SLM_under_val Float
+  SLM_upper_val Float
+  SLM_count     Int
+  BMR_under_val Float
+  BMR_upper_val Float
+  BMR_count     Int
+  UpdateUTC     DateTime? @default(dbgenerated("getutcdate()"), map: "DF_BigData_HistogramInfo_UpdateUTCtime") @db.DateTime
+  CreateUTC     DateTime? @default(dbgenerated("getutcdate()"), map: "DF_BigData_HistogramInfo_CreateUTCtime") @db.DateTime
+
+  @@id([Gender, Age, HT, WT, hist_index], map: "HistogramID")
+}
+
+model BigData_HistogramInfo_Fitscore {
+  BodyCompType String @db.NVarChar(50)
+  Gender       String @db.NVarChar(50)
+  Age          Int
+  HT           Int
+  WT           Int
+  hist_index   Int
+  under_val    Float  @db.Real
+  upper_val    Float  @db.Real
+  count        Int
+
+  @@id([BodyCompType, Gender, Age, HT, WT, hist_index], map: "PK_BigData_HistogramInfo_Fitscore")
+}
+
+model BigData_HistogramInfo_MeasurePattern {
+  measureType String    @db.NVarChar(50)
+  hist_index  Int
+  under_val   Float     @db.Real
+  upper_val   Float     @db.Real
+  count       Float     @db.Real
+  UpdateUTC   DateTime? @default(now(), map: "DF_BigData_HistogramInfo_MeasureInfo_UpdateUTC") @db.DateTime
+  CreateUTC   DateTime? @default(now(), map: "DF_BigData_HistogramInfo_MeasureInfo_CreateUTC") @db.DateTime
+
+  @@id([measureType, hist_index], map: "PK_BigData_HistogramInfo_MeasurePattern")
+}
+
+model BigData_HistogramInfo_VFA {
+  BodyCompType String @db.NVarChar(50)
+  Gender       String @db.NVarChar(50)
+  Age          Int
+  HT           Int
+  WT           Int
+  hist_index   Int
+  under_val    Float
+  upper_val    Float
+  count        Int
+
+  @@id([BodyCompType, Gender, Age, HT, WT, hist_index], map: "PK_BigData_HistogramInfo_VFA")
+}
+
+model BigData_HistogramInfo_VFALevel {
+  BodyCompType String @db.NVarChar(50)
+  Gender       String @db.NVarChar(50)
+  Age          Int
+  HT           Int
+  WT           Int
+  hist_index   Int
+  under_val    Float
+  upper_val    Float
+  count        Int
+
+  @@id([BodyCompType, Gender, Age, HT, WT, hist_index], map: "PK_BigData_HistogramInfo_VFALevel")
+}
+
+model BigData_ParamOfBodycompPercentileInfo {
+  Gender     String   @db.NVarChar(50)
+  BodyComp   String   @db.NVarChar(50)
+  AGE        Boolean
+  HT         Boolean
+  WT         Boolean
+  Percentile Int
+  CoefList   String   @db.NVarChar(Max)
+  CreateUTC  DateTime @default(now(), map: "DF_BigData_Percentile_CoefInfo_CreateUTC") @db.DateTime
+  UpdateUTC  DateTime @default(now(), map: "DF_BigData_Percentile_CoefInfo_UpdateUTC") @db.DateTime
+
+  @@id([Gender, BodyComp, AGE, HT, WT, Percentile], map: "PK_BigData_ParamOfBodycompPercentileInfo")
+}
+
+model BigData_ParamOfGrowthCDFInfo {
+  Gender       String @db.Char(3)
+  BodyCompType String @db.Char(10)
+  Month        Int
+  popt0        Float  @db.Real
+  popt1        Float  @db.Real
+
+  @@id([Gender, BodyCompType, Month], map: "PK_BigData_ParamOfGrowthCDFInfo")
+}
+
+model BigData_ParamOfMeasurePatternInfo {
+  Type     String @db.NVarChar(50)
+  Percent  Int    @db.TinyInt
+  CoefList String @db.NVarChar(Max)
+
+  @@id([Type, Percent], map: "PK_BigData_ParamOfMeasurePatternInfo")
+}
+
+model BigData_ScatterGraph_AxesAndLegendChoiceInfo {
+  SelectedKey        String   @id(map: "PK_BigData_ScatterGraph_SelectableColumn") @db.NVarChar(100)
+  ButtonText         String   @db.NVarChar(50)
+  AvailableForX      Boolean
+  AvailableForY      Boolean
+  AvailableForLegend Boolean
+  CreateUTC          DateTime @default(now(), map: "DF_BigData_ScatterGraph_SelectableColumn_CreateUTC") @db.DateTime
+  UpdateUTC          DateTime @default(now(), map: "DF_BigData_ScatterGraph_SelectableColumn_UpdateUTC") @db.DateTime
+  AuxiliarylineRank  Int
+  NeedToShow         Boolean  @default(false, map: "DF__BigData_S__NeedT__3D389CD4")
+}
+
+model BigData_ScatterGraph_Filter {
+  FilterType                            String                                  @id(map: "PK_BigData_ScatterGraph_FilterMainInfo") @db.NVarChar(100)
+  FilterCategoryEnum                    String                                  @db.NVarChar(100)
+  Question                              String                                  @default("", map: "DF__BigData_S__Quest__4523D75F") @db.NVarChar(200)
+  ThumbnailURL                          String                                  @default("", map: "DF__BigData_S__Thumb__470C1FD1") @db.NVarChar(300)
+  NeedToShow                            Boolean                                 @default(false, map: "DF__BigData_S__NeedT__4015097F")
+  BigData_ScatterGraph_FilterChoiceInfo BigData_ScatterGraph_FilterChoiceInfo[]
+}
+
+model BigData_ScatterGraph_FilterAndChoiceCombinationRecommended {
+  Xaxis            String   @db.NVarChar(50)
+  Yaxis            String   @db.NVarChar(50)
+  Legend           String   @db.NVarChar(50)
+  IsFilterAgeRange Boolean
+  IsFilterGender   Boolean
+  BodyCompType     String   @db.NVarChar(50)
+  IsFilterCluster  Boolean
+  ReadCount        Int      @default(0, map: "DF__BigData_S__ReadC__4657F2BA")
+  Priority         Int
+  DescriptionText  String   @db.NVarChar(200)
+  CreateUTC        DateTime @default(dbgenerated("getutcdate()"), map: "DF__BigData_S__Creat__474C16F3") @db.DateTime
+  UpdateUTC        DateTime @default(dbgenerated("getutcdate()"), map: "DF__BigData_S__Updat__48403B2C") @db.DateTime
+
+  @@id([Xaxis, Yaxis, Legend, IsFilterAgeRange, IsFilterGender, BodyCompType, IsFilterCluster], map: "PK_BigData_ScatterGraph_FilterAndChoiceCombinationRecommended")
+}
+
+model BigData_ScatterGraph_FilterChoiceInfo {
+  DisplayText                 String                      @db.NVarChar(50)
+  ButtonWidth                 String                      @db.NVarChar(50)
+  SelectedKey                 String                      @db.NVarChar(200)
+  CreateUTC                   DateTime                    @default(now(), map: "DF_BigData_ScatterGraph_FilterChoiceInfo_CreateUTC") @db.DateTime
+  UpdateUTC                   DateTime                    @default(now(), map: "DF_BigData_ScatterGraph_FilterChoiceInfo_UpdateUTC") @db.DateTime
+  LegendColor                 String?                     @db.NVarChar(50)
+  FilterType                  String                      @db.NVarChar(100)
+  Priority                    Int                         @default(-1, map: "DF__BigData_S__Prior__4C45D63A")
+  BigData_ScatterGraph_Filter BigData_ScatterGraph_Filter @relation(fields: [FilterType], references: [FilterType], onDelete: Cascade, map: "FK_BigData_ScatterGraph_FilterChoiceInfo_ScatterGraph_Filter")
+
+  @@id([FilterType, SelectedKey], map: "PK_BigData_ScatterGraph_FilterChoiceInfo")
+}
+
+model BigData_ScatterGraph_InbodyData {
+  UID                    BigInt
+  FilterGender           String @db.NVarChar(50)
+  FilterAge              Int
+  FilterWT               Int
+  FilterHT               Int
+  FilterClusterIndex_BMI Int
+  FilterClusterIndex_PBF Int
+  HT                     Float
+  AGE                    Float
+  Gender                 String @db.NVarChar(50)
+  WT                     Float
+  FFM                    Float?
+  SMM                    Float?
+  SLM                    Float?
+  BFM                    Float?
+  BMI                    Float?
+  PBF                    Float?
+  TBW                    Float?
+  ICW                    Float?
+  ECW                    Float?
+  WED                    Float?
+  BMR                    Float?
+  VFA                    Float?
+  WHR                    Float?
+
+  @@id([FilterGender, FilterAge, FilterWT, FilterHT, FilterClusterIndex_BMI, FilterClusterIndex_PBF, UID], map: "PK_BigData_ScatterGraph_InbodyData")
+}
+
+model BigData_ScatterGraph_SampleData {
+  UID                    BigInt
+  FilterGender           String @db.NVarChar(50)
+  FilterAge              Float
+  FilterWT               Float
+  FilterHT               Float
+  FilterClusterIndex_BMI Int
+  FilterClusterIndex_PBF Int
+  HT                     Float
+  AGE                    Float
+  Gender                 String @db.NVarChar(50)
+  WT                     Float
+  FFM                    Float?
+  SMM                    Float?
+  SLM                    Float?
+  BFM                    Float?
+  BMI                    Float?
+  PBF                    Float?
+  TBW                    Float?
+  ICW                    Float?
+  ECW                    Float?
+  WED                    Float?
+  BMR                    Float?
+  VFA                    Float?
+  WHR                    Float?
+
+  @@id([UID, FilterGender, FilterAge, FilterWT, FilterHT, FilterClusterIndex_BMI, FilterClusterIndex_PBF], map: "PK_BigData_ScatterGraph_SampleData", clustered: false)
+}
+
+model Cluster_AddressDefineInfo {
+  Gender            String   @db.Char(3)
+  Age               Float
+  BMI_under         Float
+  BMI_upper         Float
+  PBF_under         Float
+  PBF_upper         Float
+  BMI_Address       Int
+  PBF_Address       Int
+  BMI_Cluster       Int
+  PBF_Cluster       Int
+  ClusterIndex      String   @db.NVarChar(30)
+  ClusterPercentile Float
+  CreateUTC         DateTime @default(dbgenerated("getutcdate()"), map: "DF_Cluster_AddressDefineInfo_CreateUTC") @db.DateTime
+  UpdateUTC         DateTime @default(dbgenerated("getutcdate()"), map: "DF_Cluster_AddressDefineInfo_UpdateUTC") @db.DateTime
+
+  @@id([Gender, Age, BMI_under, BMI_upper, PBF_under, PBF_upper], map: "ClusterDefineID")
+}
+
+model Cluster_BodyClassByRank {
+  Generation               String                     @db.Char(4)
+  Rank                     Int
+  BodyClass                String                     @db.NVarChar(50)
+  Cluster_RankByGeneration Cluster_RankByGeneration[]
+
+  @@id([Generation, Rank], map: "PK_Cluster_BodyClassByRank")
+}
+
+model Cluster_CelebrityInfo {
+  ID           BigInt   @id(map: "PK_Cluster_CelebrityInfo")
+  Name         String   @db.NVarChar(50)
+  ClusterID    String   @db.NVarChar(100)
+  Gender       String   @db.Char(1)
+  Age          Int?
+  HT           Float?
+  WT           Float?
+  BMI          Float
+  PBF          Float
+  BFM          Float?
+  SMM          Float?
+  MeasureYear  Int?
+  ReferenceURL String   @db.NVarChar(Max)
+  CreateUTC    DateTime @default(dbgenerated("getutcdate()"), map: "DF_Cluster_CelebrityInfo_CreateUTC") @db.DateTime
+}
+
+model Cluster_ContentsInfo {
+  ClusterID                     String                          @id(map: "PK_Cluster_ContentsInfo") @db.NVarChar(100)
+  BodytypeID                    String                          @db.NVarChar(20)
+  Bodytype                      String                          @db.NVarChar(20)
+  ClusterName                   String                          @db.NVarChar(100)
+  ClusterNameIncludeTag         String                          @db.NVarChar(100)
+  Cluster_IMG_URL               String                          @db.NVarChar(100)
+  RepresentColor                String                          @db.NVarChar(10)
+  Abstract                      String                          @db.NVarChar(Max)
+  Bodyform_Title                String                          @db.NVarChar(100)
+  Bodyform_Dis                  String                          @db.NVarChar(Max)
+  Bigdata_Title                 String                          @db.NVarChar(Max)
+  BodyformMap_Abstract          String                          @db.NVarChar(Max)
+  BodyformMap_Dis               String                          @db.NVarChar(Max)
+  Bigdata_Dis                   String                          @db.NVarChar(Max)
+  Percentile_Title              String                          @db.NVarChar(200)
+  HistType                      String?                         @db.NVarChar(100)
+  Percentile_Dis                String                          @db.NVarChar(Max)
+  ClusterProfile_IMG_URL        String                          @db.NVarChar(100)
+  LastMention                   String                          @db.NVarChar(100)
+  ClusterHalf_IMG_URL           String                          @db.NVarChar(100)
+  Variable                      String?                         @db.NVarChar(200)
+  TotalReadCount                Int
+  TotalGoodCount                Int
+  TotalBadCount                 Int
+  TotalShareCount               Int
+  TotalReadCountOfShared        Int
+  CreateUTC                     DateTime                        @default(dbgenerated("getutcdate()"), map: "DF_Cluster_ContentsInfo_CreateUTC") @db.DateTime
+  ModifyUTC                     DateTime                        @default(dbgenerated("getutcdate()"), map: "DF_Cluster_ContentsInfo_UpdateUTC") @db.DateTime
+  Cluster_IndexAndClusterIDJoin Cluster_IndexAndClusterIDJoin[]
+}
+
+model Cluster_ContentsInfoV2 {
+  ClusterID                  String   @id(map: "PK_Cluster_ContentsInfoV2") @db.NVarChar(100)
+  ClusterName                String   @db.NVarChar(100)
+  ClusterNameIncludeTag      String   @db.NVarChar(100)
+  ClusterPercentile          Float    @db.Real
+  RepresentColor             String   @db.NVarChar(20)
+  BodyTypeID                 String   @db.NVarChar(20)
+  BodyTypeName               String   @db.NVarChar(30)
+  ClusterAbstract            String   @db.NVarChar(Max)
+  BodyClass                  String   @db.NVarChar(10)
+  ClusterDescriptionTitle    String   @db.NVarChar(Max)
+  ClusterDescriptionContents String   @db.NVarChar(Max)
+  AgingSpeedTitle            String   @default("", map: "DEFAULT_Cluster_ContentsInfoV2_AgingSpeedTitle") @db.NVarChar(Max)
+  AgingSpeedValue            String   @default("", map: "DEFAULT_Cluster_ContentsInfoV2_AgingSpeedValue") @db.NVarChar(10)
+  AgingSpeedExplanation      String   @default("", map: "DEFAULT_Cluster_ContentsInfoV2_AgingSpeedExplanation") @db.NVarChar(Max)
+  BodyFormMapTitle           String   @db.NVarChar(100)
+  BodyFormMapAbstract        String   @default("", map: "DEFAULT_Cluster_ContentsInfoV2_BodyFormMapAbstract") @db.NVarChar(Max)
+  BodyFormMapCaption         String   @db.NVarChar(Max)
+  BodyFormMapExplanation     String   @db.NVarChar(Max)
+  PercentileInfoTitle        String   @db.NVarChar(Max)
+  HistogramType              String?  @db.NVarChar(100)
+  HistogramCaption           String   @default("", map: "DEFAULT_Cluster_ContentsInfoV2_HistogramCaption") @db.NVarChar(Max)
+  PercentileInfoExplanation  String   @db.NVarChar(Max)
+  ChronicDiseaseExplanation  String   @default("", map: "DEFAULT_Cluster_ContentsInfoV2_ChronicDiseaseExplanation") @db.NVarChar(Max)
+  LastMention                String   @db.NVarChar(100)
+  UsedVariableTags           String?  @db.NVarChar(200)
+  TotalReadCount             Int      @default(0, map: "DEFAULT_Cluster_ContentsInfoV2_TotalReadCount")
+  TotalGoodCount             Int      @default(0, map: "DEFAULT_Cluster_ContentsInfoV2_TotalGoodCount")
+  TotalBadCount              Int      @default(0, map: "DEFAULT_Cluster_ContentsInfoV2_TotalBadCount")
+  TotalShareCount            Int      @default(0, map: "DEFAULT_Cluster_ContentsInfoV2_TotalShareCount")
+  TotalReadCountOfShared     Int      @default(0, map: "DEFAULT_Cluster_ContentsInfoV2_TotalReadCountOfShared")
+  CreateUTC                  DateTime @default(dbgenerated("getutcdate()"), map: "DEFAULT_Cluster_ContentsInfoV2_CreateUTC") @db.DateTime
+  ModifyUTC                  DateTime @default(dbgenerated("getutcdate()"), map: "DEFAULT_Cluster_ContentsInfoV2_ModifyUTC") @db.DateTime
+}
+
+model Cluster_ContentsInfoV3 {
+  ClusterID                            String   @id(map: "PK_Cluster_ContentsInfoV3") @db.NVarChar(100)
+  ClusterName                          String   @db.NVarChar(100)
+  ClusterNameIncludeTag                String   @db.NVarChar(100)
+  BodyClass                            String   @db.NVarChar(10)
+  ClusterAbstract                      String   @db.NVarChar(300)
+  ClusterPercentage                    Float    @db.Real
+  RepresentColor                       String   @db.NVarChar(20)
+  BodyTypeID                           String   @db.NVarChar(20)
+  BodyTypeName                         String   @db.NVarChar(30)
+  ClusterDescriptionTitle              String   @db.NVarChar(300)
+  ClusterDescriptionContents           String   @db.NVarChar(Max)
+  AgingSpeedTitle                      String   @default("", map: "DEFAULT_Cluster_ContentsInfoV3_AgingSpeedTitle") @db.NVarChar(Max)
+  AgingSpeedValue                      String   @default("", map: "DEFAULT_Cluster_ContentsInfoV3_AgingSpeedValue") @db.NVarChar(10)
+  AgingSpeedExplanation                String   @default("", map: "DEFAULT_Cluster_ContentsInfoV3_AgingSpeedExplanation1") @db.NVarChar(Max)
+  BodyFormMapTitle                     String   @default("", map: "DF__Cluster_C__BodyF__702E30F5") @db.NVarChar(300)
+  BodyFormMapExplanation               String   @db.NVarChar(Max)
+  CustumLearningContents               String?  @db.NVarChar(Max)
+  PercentileInfoTitle                  String   @db.NVarChar(Max)
+  HistogramType                        String?  @db.NVarChar(100)
+  HistogramCaption                     String   @default("", map: "DEFAULT_Cluster_ContentsInfoV3_HistogramCaption") @db.NVarChar(Max)
+  PercentileInfoExplanation1           String   @db.NVarChar(Max)
+  PercentileInfoExplanation2           String   @db.NVarChar(Max)
+  LastMention                          String   @db.NVarChar(100)
+  UsedVariableTags                     String?  @db.NVarChar(200)
+  TotalReadCount                       Int      @default(0, map: "DEFAULT_Cluster_ContentsInfoV3_TotalReadCount")
+  TotalGoodCount                       Int      @default(0, map: "DEFAULT_Cluster_ContentsInfoV3_TotalGoodCount")
+  TotalBadCount                        Int      @default(0, map: "DEFAULT_Cluster_ContentsInfoV3_TotalBadCount")
+  TotalShareCount                      Int      @default(0, map: "DEFAULT_Cluster_ContentsInfoV3_TotalShareCount")
+  TotalReadCountOfShared               Int      @default(0, map: "DEFAULT_Cluster_ContentsInfoV3_TotalReadCountOfShared")
+  CreateUTC                            DateTime @default(dbgenerated("getutcdate()"), map: "DEFAULT_Cluster_ContentsInfoV3_CreateUTC") @db.DateTime
+  ModifyUTC                            DateTime @default(dbgenerated("getutcdate()"), map: "DEFAULT_Cluster_ContentsInfoV3_ModifyUTC") @db.DateTime
+  AgingSpeedExplanation2               String   @default("", map: "DF__Cluster_C__Aging__4F8C5739") @db.NVarChar(Max)
+  PercentileInfoExplanation1ForNonuser String   @default("", map: "DF__Cluster_C__Perce__2190825F") @db.NVarChar(Max)
+  PercentileInfoExplanation2ForNonuser String   @default("", map: "DF__Cluster_C__Perce__2284A698") @db.NVarChar(Max)
+}
+
+model Cluster_ContentsInfoV3ByTypeName {
+  ClusterID                  String   @db.NVarChar(100)
+  TypeName                   String   @db.NVarChar(50)
+  TypeValue                  String   @db.NVarChar(50)
+  BodyFormMapExplanation     String?  @db.NVarChar(Max)
+  PercentileInfoExplanation1 String?  @db.NVarChar(Max)
+  PercentileInfoExplanation2 String?  @db.NVarChar(Max)
+  AgingSpeedExplanation2     String?  @db.NVarChar(Max)
+  UsedVariableTags           String?  @db.NVarChar(200)
+  CreateUTC                  DateTime @default(dbgenerated("getutcdate()"), map: "DEFAULT_Cluster_ContentsInfoV3ByTypeName_CreateUTC") @db.DateTime
+  ClusterDescriptionContents String?  @db.NVarChar(Max)
+
+  @@id([ClusterID, TypeName, TypeValue], map: "PK_Cluster_ContentsInfoV3ByTypeName")
+}
+
+model Cluster_ContentsInfoV4 {
+  ClusterID                  String   @id(map: "PK_Cluster_ContentsInfoV4") @db.NVarChar(100)
+  ClusterName                String   @db.NVarChar(100)
+  ClusterNameIncludeTag      String   @db.NVarChar(100)
+  ClusterPercentage          Float    @default(0, map: "DEFAULT_Cluster_ContentsInfoV4_ClusterPercentage") @db.Real
+  RepresentColor             String   @db.NVarChar(20)
+  BodyTypeID                 String   @db.NVarChar(20)
+  BodyTypeName               String   @db.NVarChar(30)
+  ClusterAbstract            String   @db.NVarChar(Max)
+  BodyClass                  String   @db.NVarChar(10)
+  ClusterDescriptionTitle    String   @db.NVarChar(Max)
+  ClusterDescriptionContents String   @db.NVarChar(Max)
+  AgingSpeedTitle            String   @default("", map: "DEFAULT_Cluster_ContentsInfoV4_AgingSpeedTitle") @db.NVarChar(Max)
+  AgingSpeedValue            String   @default("", map: "DEFAULT_Cluster_ContentsInfoV4_AgingSpeedValue") @db.NVarChar(10)
+  AgingSpeedExplanation      String   @default("", map: "DEFAULT_Cluster_ContentsInfoV4_AgingSpeedExplanation") @db.NVarChar(Max)
+  BodyFormMapTitle           String   @db.NVarChar(100)
+  BodyFormMapAbstract        String   @default("", map: "DEFAULT_Cluster_ContentsInfoV4_BodyFormMapAbstract") @db.NVarChar(Max)
+  BodyFormMapCaption         String   @db.NVarChar(Max)
+  BodyFormMapExplanation     String   @db.NVarChar(Max)
+  PercentileInfoTitle        String   @db.NVarChar(Max)
+  HistogramType              String?  @db.NVarChar(100)
+  HistogramCaption           String   @default("", map: "DEFAULT_Cluster_ContentsInfoV4_HistogramCaption") @db.NVarChar(Max)
+  PercentileInfoExplanation  String   @db.NVarChar(Max)
+  ChronicDiseaseExplanation  String   @default("", map: "DEFAULT_Cluster_ContentsInfoV4_ChronicDiseaseExplanation") @db.NVarChar(Max)
+  LastMention                String   @db.NVarChar(100)
+  UsedVariableTags           String?  @db.NVarChar(200)
+  TotalReadCount             Int      @default(0, map: "DEFAULT_Cluster_ContentsInfoV4_TotalReadCount")
+  TotalGoodCount             Int      @default(0, map: "DEFAULT_Cluster_ContentsInfoV4_TotalGoodCount")
+  TotalBadCount              Int      @default(0, map: "DEFAULT_Cluster_ContentsInfoV4_TotalBadCount")
+  TotalShareCount            Int      @default(0, map: "DEFAULT_Cluster_ContentsInfoV4_TotalShareCount")
+  TotalReadCountOfShared     Int      @default(0, map: "DEFAULT_Cluster_ContentsInfoV4_TotalReadCountOfShared")
+  CreateUTC                  DateTime @default(dbgenerated("getutcdate()"), map: "DEFAULT_Cluster_ContentsInfoV4_CreateUTC") @db.DateTime
+  ModifyUTC                  DateTime @default(dbgenerated("getutcdate()"), map: "DEFAULT_Cluster_ContentsInfoV4_ModifyUTC") @db.DateTime
+}
+
+model Cluster_DeclareErorrCase {
+  UID             BigInt
+  DeclareDatetime DateTime @db.DateTime
+  ErrorMessage    String   @db.NVarChar(Max)
+  CreateUTC       DateTime @default(now(), map: "DF_Cluster_DeclareErorrCase_CreateUTC") @db.DateTime
+  UpdateUTC       DateTime @default(now(), map: "DF_Cluster_DeclareErorrCase_UpdateUTC") @db.DateTime
+
+  @@id([UID, CreateUTC], map: "PK_Cluster_DeclareErorrCase")
+}
+
+model Cluster_DeclareHistory {
+  UID               BigInt
+  Age               Int
+  Gender            String           @db.Char(3)
+  WT_represent      Float            @db.Real
+  BMI_represent     Float            @db.Real
+  PBF_represent     Float            @db.Real
+  SMM_represent     Float            @db.Real
+  BMR_represent     Float            @db.Real
+  BFM_represent     Float            @db.Real
+  WT_recent         Float            @db.Real
+  BMI_recent        Float            @db.Real
+  PBF_recent        Float            @db.Real
+  SMM_recent        Float            @db.Real
+  BMR_recent        Float            @db.Real
+  BFM_recent        Float            @db.Real
+  MeasureCount      Int
+  BMI_Cluster       Int
+  PBF_Cluster       Int
+  ClusterID         String           @db.NVarChar(100)
+  Accuracy          Float
+  DeclareType       String           @default("Monthly", map: "DEFAULT_Cluster_DeclareHistory_DeclareType") @db.NVarChar(20)
+  UploadDatetime    DateTime?        @default(now(), map: "DF_Cluster_DeclareHistory_UploadDatetime") @db.DateTime
+  DeclareDatetime   DateTime         @db.DateTime
+  PublishDatetime   DateTime         @default(now(), map: "DF_Cluster_DeclareHistory_PublishDatetime") @db.DateTime
+  ReadCount         Int
+  Good              Boolean
+  Bad               Boolean
+  ShareCount        Int
+  ReadCountOfShared Int
+  CreateUTC         DateTime         @default(dbgenerated("getutcdate()"), map: "DF_Cluster_DeclareHistory_CreateUTC") @db.DateTime
+  ModifyUTC         DateTime         @default(dbgenerated("getutcdate()"), map: "DF_Cluster_DeclareHistory_ModifyUTC") @db.DateTime
+  Profile_UserInfo  Profile_UserInfo @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_Cluster_DeclareHistory_Profile_UserInfo")
+
+  @@id([UID, DeclareDatetime], map: "DeclareHistoryID")
+}
+
+model Cluster_DeclareHistory_NonUser {
+  ID              Int      @id(map: "PK_Cluster_DeclareHistory_NonUser") @default(autoincrement())
+  UUID            String   @unique(map: "UQ__Cluster___65A475E6D4CA0AC1") @db.NVarChar(256)
+  UserName        String   @db.NVarChar(50)
+  ClusterID       String   @db.NVarChar(100)
+  Age             Int
+  HT              Float    @db.Real
+  Gender          String   @db.Char(1)
+  WT_represent    Float    @db.Real
+  BMI_represent   Float    @db.Real
+  PBF_represent   Float    @db.Real
+  SMM_represent   Float    @db.Real
+  BFM_represent   Float    @db.Real
+  WT_recent       Float    @db.Real
+  BMI_recent      Float    @db.Real
+  PBF_recent      Float    @db.Real
+  SMM_recent      Float    @db.Real
+  BFM_recent      Float    @db.Real
+  BMI_Cluster     Int
+  PBF_Cluster     Int
+  DeclareDatetime DateTime @db.DateTime
+  ReadCount       Int      @default(0, map: "DF__Cluster_D__ReadC__6BD3902C")
+  ShareCount      Int      @default(0, map: "DF__Cluster_D__Share__6CC7B465")
+  CreateUTC       DateTime @default(dbgenerated("getutcdate()"), map: "DF_Cluster_DeclareHistory_NonUser_CreateUTC") @db.DateTime
+  UpdateUTC       DateTime @default(dbgenerated("getutcdate()"), map: "DF_Cluster_DeclareHistory_NonUser_UpdateUTC") @db.DateTime
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Cluster_DeclareHistory2 {
+  UID               BigInt
+  Age               Int
+  Gender            String    @db.Char(3)
+  WT_represent      Float     @db.Real
+  BMI_represent     Float     @db.Real
+  PBF_represent     Float     @db.Real
+  SMM_represent     Float     @db.Real
+  BMR_represent     Float     @db.Real
+  BFM_represent     Float     @db.Real
+  WT_recent         Float     @db.Real
+  BMI_recent        Float     @db.Real
+  PBF_recent        Float     @db.Real
+  SMM_recent        Float     @db.Real
+  BMR_recent        Float     @db.Real
+  BFM_recent        Float     @db.Real
+  MeasureCount      Int
+  BMI_Cluster       Int
+  PBF_Cluster       Int
+  ClusterID         String    @db.NVarChar(100)
+  Accuracy          Float
+  DeclareType       String    @db.NVarChar(20)
+  UploadDatetime    DateTime? @db.DateTime
+  DeclareDatetime   DateTime  @db.DateTime
+  PublishDatetime   DateTime  @db.DateTime
+  ReadCount         Int
+  Good              Boolean
+  Bad               Boolean
+  ShareCount        Int
+  ReadCountOfShared Int
+  CreateUTC         DateTime  @db.DateTime
+  ModifyUTC         DateTime  @db.DateTime
+
+  @@ignore
+}
+
+model Cluster_IndexAndClusterIDJoin {
+  ClusterIndex         String               @db.NVarChar(10)
+  AgeUnder             Int
+  AgeUpper             Int
+  ClusterID            String               @db.NVarChar(100)
+  Cluster_ContentsInfo Cluster_ContentsInfo @relation(fields: [ClusterID], references: [ClusterID], onDelete: Cascade, map: "FK_Cluster_IndexAndClusterIDJoin_Cluster_ContentsInfo")
+
+  @@id([ClusterIndex, AgeUnder, AgeUpper, ClusterID], map: "JoinID")
+}
+
+model Cluster_RankByGeneration {
+  AgeRange                Int
+  Gender                  String                  @db.Char(1)
+  Rank                    Int
+  ClusterID               String                  @db.NVarChar(100)
+  Generation              String                  @default("2040", map: "DF__Cluster_R__Gener__65D09E13") @db.Char(4)
+  Cluster_BodyClassByRank Cluster_BodyClassByRank @relation(fields: [Generation, Rank], references: [Generation, Rank], onDelete: Cascade, map: "FK_Cluster_RankByGeneration_Cluster_BodyClassByRank")
+
+  @@id([AgeRange, Gender, Rank], map: "PK_Cluster_RankByGeneration")
+}
+
+model Cluster_StatisticsTempData {
+  Uid          BigInt   @id(map: "PK__Cluster___C5B69A4A20BAAE72")
+  BmiCluster   Int
+  PbfCluster   Int
+  ClusterId    String   @db.VarChar(50)
+  Age          Int
+  Gender       String   @db.VarChar(10)
+  BmiRepresent Float
+  PbfRepresent Float
+  WtRepresent  Float
+  SmmRepresent Float
+  FitScore     Float?
+  InBodyScore  Float?
+  TotScore     Float?
+  CreatedAt    DateTime @default(now(), map: "DF__Cluster_S__Creat__2319A375") @db.DateTime
+
+  @@index([BmiCluster, PbfCluster], map: "IX_ClusterStatisticsTempData_BmiPbf")
+  @@index([ClusterId], map: "IX_ClusterStatisticsTempData_ClusterId")
+}
+
+model CustomLearning_ChoicesInfo {
+  CustomLearningID              Int
+  AnswerKey                     Int                             @default(0, map: "DEFAULT_Survey_ChoicesInfo_AnswerKey")
+  AnswerValue                   String                          @db.NVarChar(50)
+  UserCount                     Int                             @default(0, map: "DEFAULT_Survey_ChoicesInfo_UserCount")
+  CustomLearning_MainInfo       CustomLearning_MainInfo         @relation(fields: [CustomLearningID], references: [ID], onDelete: Cascade, map: "FK_Survey_ChoicesInfo_Survey_MainInfo")
+  CustomLearning_TopRankCluster CustomLearning_TopRankCluster[]
+
+  @@id([CustomLearningID, AnswerKey], map: "PK_Survey_ChoicesInfo")
+}
+
+model CustomLearning_MainInfo {
+  ID                                   Int                                    @id(map: "PK_Survey_MainInfo")
+  Title                                String                                 @db.NVarChar(Max)
+  Category                             String                                 @db.NVarChar(50)
+  UIType                               String                                 @db.NVarChar(50)
+  AnswerType                           String                                 @db.NVarChar(100)
+  AnswerComment                        String?                                @db.NVarChar(Max)
+  SubTitle                             String?                                @db.NVarChar(Max)
+  IsDeploy                             Boolean
+  StartDate                            DateTime                               @db.DateTime
+  EndDate                              DateTime                               @db.DateTime
+  CreateUTC                            DateTime                               @default(now(), map: "DEFAULT_Survey_MainInfo_CreateUTC") @db.DateTime
+  UpdateUTC                            DateTime                               @default(now(), map: "DEFAULT_Survey_MainInfo_UpdateUTC") @db.DateTime
+  CustomLearning_ChoicesInfo           CustomLearning_ChoicesInfo[]
+  CustomLearning_UserAnswerLoggingInfo CustomLearning_UserAnswerLoggingInfo[]
+}
+
+model CustomLearning_TopRankCluster {
+  CustomLearningID           Int
+  AnswerKey                  Int
+  TopRank                    Int
+  Ratio                      Float                      @db.Real
+  BodyTypeID                 String                     @db.NVarChar(100)
+  Evaluating                 String?                    @db.NChar(1)
+  OppositeAnswerKey          Int?
+  CreateUTC                  DateTime                   @default(now(), map: "DF_CustomLearning_TopRankCluster_CreateUTC") @db.DateTime
+  UpdateUTC                  DateTime                   @default(now(), map: "DF_CustomLearning_TopRankCluster_UpdateUTC") @db.DateTime
+  ClusterID                  String                     @default("\"\"", map: "DF__CustomLea__Clust__78E37287") @db.NVarChar(100)
+  CustomLearning_ChoicesInfo CustomLearning_ChoicesInfo @relation(fields: [CustomLearningID, AnswerKey], references: [CustomLearningID, AnswerKey], onDelete: Cascade, map: "FK_CustomLearning_TopRankCluster_CustomLearning_ChoicesInfo")
+
+  @@id([CustomLearningID, AnswerKey, TopRank], map: "PK_CustomLearning_TopRankCluster")
+  @@index([BodyTypeID], map: "IX_CustomLearning_TopRankCluster_ClusterID")
+}
+
+model CustomLearning_UserAnswerLoggingInfo {
+  UID                     BigInt
+  CustomLearningID        Int
+  AnswerKey               Int
+  AnswerValue             String                  @db.NVarChar(50)
+  CreateUTC               DateTime                @default(now(), map: "DF_Survey_UserAnswerLoggingInfo_CreateUTC") @db.DateTime
+  UpdateUTC               DateTime                @default(now(), map: "DF_Survey_UserAnswerLoggingInfo_UpdateUTC") @db.DateTime
+  Profile_UserInfo        Profile_UserInfo        @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_Survey_UserAnswerLoggingInfo_Profile_UserInfo")
+  CustomLearning_MainInfo CustomLearning_MainInfo @relation(fields: [CustomLearningID], references: [ID], onDelete: Cascade, map: "FK_Survey_UserAnswerLoggingInfo_Survey_MainInfo")
+
+  @@id([UID, CustomLearningID, AnswerKey], map: "PK_Survey_UserAnswerLoggingInfo")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model DashBoard_DietPreview {
+  UID       BigInt
+  DATETIMES DateTime @db.DateTime
+  CreateUTC DateTime @default(now(), map: "DF_DashBoard_DietPreview_CreateUTC") @db.DateTime
+  UpdateUTC DateTime @default(now(), map: "DF_DashBoard_DietPreview_UpdateUTC") @db.DateTime
+
+  @@ignore
+}
+
+model DashBoard_FoodDB {
+  FoodID         Int      @id(map: "PK_DashBoard_FoodDB")
+  CategoryName   String   @db.NVarChar(50)
+  FoodName       String   @db.NVarChar(50)
+  file_URL       String   @db.NVarChar(50)
+  Protein        Float
+  Kcal           Float
+  ProteinPerKcal Float
+  LinkFoodID     Int
+  CreateUTC      DateTime @default(now(), map: "DF_DashBoard_FoodDB_CreateUTC") @db.DateTime
+  UpdateUTC      DateTime @default(now(), map: "DF_DashBoard_FoodDB_UpdateUTC") @db.DateTime
+}
+
+model DashBoard_InBodyEveryDayApplyInfo {
+  UID              BigInt           @id(map: "PK_DashBoard_InBodyEveryDayApplyInfo")
+  StarNumReplyed   Int
+  CreateUTC        DateTime         @default(now(), map: "DF_DashBoard_InBodyEveryDayReplyInfo_CreateUTC") @db.DateTime
+  UpdateUTC        DateTime         @default(now(), map: "DF_DashBoard_InBodyEveryDayReplyInfo_UpdateUTC") @db.DateTime
+  Profile_UserInfo Profile_UserInfo @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_DashBoard_InBodyEveryDayApplyInfo_Profile_UserInfo")
+}
+
+model DashBoard_InBodyEveryDayDrawEventInfo {
+  ID                                Int                               @default(autoincrement())
+  UID                               BigInt
+  StarNum                           Int
+  EventItemID                       Int
+  SerialNumber                      String                            @db.NVarChar(100)
+  CreateUTC                         DateTime                          @default(dbgenerated("getutcdate()"), map: "DEFAULT_DashBoard_InBodyEveryDayDrawEventInfo_CreateUTC") @db.DateTime
+  UpdateUTC                         DateTime                          @default(dbgenerated("getutcdate()"), map: "DEFAULT_DashBoard_InBodyEveryDayDrawEventInfo_UpdateUTC") @db.DateTime
+  DashBoard_InBodyEveryDayEventItem DashBoard_InBodyEveryDayEventItem @relation(fields: [EventItemID], references: [ID], onUpdate: NoAction, map: "FK_DashBoard_InBodyEveryDayDrawEventInfo_DashBoard_InBodyEveryDayEventItem")
+  Profile_UserInfo                  Profile_UserInfo                  @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_DashBoard_InBodyEveryDayDrawEventInfo_Profile_UserInfo")
+
+  @@id([ID, SerialNumber], map: "PK_DashBoard_InBodyEveryDayDrawEventInfo")
+}
+
+model DashBoard_InBodyEveryDayEvent {
+  ID                                Int                                 @id(map: "PK_DashBoard_InBodyEveryDayEvent") @default(autoincrement())
+  Title                             String                              @db.NVarChar(200)
+  PromotionDateText                 String                              @db.NVarChar(Max)
+  PromotionCaption                  String                              @db.NVarChar(Max)
+  PopupTitle                        String                              @db.NVarChar(200)
+  PopupDescription                  String                              @db.NVarChar(Max)
+  StartDate                         DateTime                            @db.DateTime
+  EndDate                           DateTime                            @db.DateTime
+  DashBoard_InBodyEveryDayEventItem DashBoard_InBodyEveryDayEventItem[]
+}
+
+model DashBoard_InBodyEveryDayEventItem {
+  ID                                    Int                                     @id(map: "PK_DashBoard_InBodyEveryDayProduct") @default(autoincrement())
+  Name                                  String                                  @db.NVarChar(200)
+  Description                           String                                  @db.NVarChar(Max)
+  ImageURL                              String                                  @db.NVarChar(Max)
+  IsActive                              Boolean
+  TagText                               String                                  @db.NVarChar(200)
+  EventID                               Int?
+  CreateUTC                             DateTime                                @default(dbgenerated("getutcdate()"), map: "DEFAULT_DashBoard_InBodyEveryDayProduct_CreateUTC")
+  UpdateUTC                             DateTime                                @default(dbgenerated("getutcdate()"), map: "DEFAULT_DashBoard_InBodyEveryDayProduct_UpdateUTC")
+  DashBoard_InBodyEveryDayDrawEventInfo DashBoard_InBodyEveryDayDrawEventInfo[]
+  DashBoard_InBodyEveryDayEvent         DashBoard_InBodyEveryDayEvent?          @relation(fields: [EventID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_DashBoard_InBodyEveryDayEventItem_DashBoard_InBodyEveryDayEvent")
+}
+
+model DashBoard_InBodyEveryDayHistory {
+  UID              BigInt
+  DATETIMES        DateTime         @db.DateTime
+  StarStack        Int              @default(0, map: "DF_Table_1_StarNum")
+  SerialNumber     String           @default("", map: "DEFAULT_DashBoard_InBodyEveryDayHistory_SerialNumber") @db.NVarChar(100)
+  isUsed           Boolean          @default(false, map: "DF_DashBoard_InBodyEveryDayHistory_isUsed")
+  CreateUTC        DateTime         @default(now(), map: "DF_DashBoard_InBodyEveryDayHistory_CreateUTC") @db.DateTime
+  UpdateUTC        DateTime         @default(now(), map: "DF_DashBoard_InBodyEveryDayHistory_UpdateUTC") @db.DateTime
+  Profile_UserInfo Profile_UserInfo @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_DashBoard_InBodyEveryDayHistory_Profile_UserInfo")
+
+  @@id([UID, DATETIMES], map: "PK_DashBoard_InBodyEveryDayHistory")
+}
+
+model DashBoard_MiniFuncLogging {
+  UID       BigInt
+  Datetime  DateTime @db.DateTime
+  FuncName  String   @db.NVarChar(50)
+  CreateUTC DateTime @default(now(), map: "DF_DashBoard_MiniFuncLogging_CreateUTC") @db.DateTime
+  UpdateUTC DateTime @default(now(), map: "DF_DashBoard_MiniFuncLogging_UpdateUTC") @db.DateTime
+
+  @@id([UID, Datetime], map: "PK_DashBoard_MiniFuncLogging")
+}
+
+model DashBoard_SimpleBanner {
+  ID                                    Int                                     @id(map: "PK_DashBoard_SimpleBanner")
+  BannerIMG_URL                         String                                  @db.NVarChar(Max)
+  RedirectType                          String                                  @db.NVarChar(100)
+  AdditionalData                        String                                  @db.NVarChar(Max)
+  BackgroundColor                       String                                  @db.NVarChar(30)
+  PositionIndex                         Int
+  MaxHeight                             Int
+  NeedToShow                            Boolean
+  StartDateTime                         DateTime                                @db.DateTime
+  EndDateTime                           DateTime                                @db.DateTime
+  HasCloseButton                        Boolean                                 @default(true, map: "DEFAULT_DashBoard_SimpleBanner_HasCloseButton")
+  IsHiddenByUserClick                   Boolean                                 @default(false, map: "DEFAULT_DashBoard_SimpleBanner_IsHiddenByUserClick")
+  CreateUTC                             DateTime                                @default(dbgenerated("getutcdate()"), map: "DEFAULT_DashBoard_SimpleBanner_CreateUTC") @db.DateTime
+  UpdateUTC                             DateTime                                @default(dbgenerated("getutcdate()"), map: "DEFAULT_DashBoard_SimpleBanner_UpdateUTC") @db.DateTime
+  Dashboard_UserInfoAndSimpleBannerJoin Dashboard_UserInfoAndSimpleBannerJoin[]
+}
+
+model Dashboard_UserInfoAndSimpleBannerJoin {
+  UID                    BigInt
+  BannerID               Int
+  ClickCount             Int                    @default(0, map: "DEFAULT_Dashboard_UserInfoAndSimpleBannerJoin_ClickCount")
+  IsClickedCloseButton   Boolean                @default(false, map: "DEFAULT_Dashboard_UserInfoAndSimpleBannerJoin_IsHide")
+  CreateUTC              DateTime               @default(dbgenerated("getutcdate()"), map: "DEFAULT_Dashboard_UserInfoAndSimpleBannerJoin_CreateUTC")
+  UpdateUTC              DateTime               @default(dbgenerated("getutcdate()"), map: "DEFAULT_Dashboard_UserInfoAndSimpleBannerJoin_UpdateUTC")
+  DashBoard_SimpleBanner DashBoard_SimpleBanner @relation(fields: [BannerID], references: [ID], onUpdate: NoAction, map: "FK_Dashboard_UserInfoAndSimpleBannerJoin_DashBoard_SimpleBanner")
+  Profile_UserInfo       Profile_UserInfo       @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_Dashboard_UserInfoAndSimpleBannerJoin_Profile_UserInfo")
+
+  @@id([UID, BannerID], map: "PK_Dashboard_UserInfoAndSimpleBannerJoin")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model DataSync_FailCaseInfo {
+  UID          BigInt
+  DATETIMES    String   @db.NVarChar(20)
+  ErrorMessage String   @db.NVarChar(Max)
+  CreateUTC    DateTime @default(now(), map: "DF_DataSync_FailCaseInfo_CreateUTC") @db.DateTime
+
+  @@ignore
+}
+
+model DataSync_History {
+  UID                   BigInt
+  SyncStartDate         DateTime         @db.DateTime
+  SpentTime             Float?
+  NumberOfSyncData      Int
+  isSyncing             Boolean
+  isCompleted           Boolean
+  SyncDirection         String           @default("Import", map: "DEFAULT_DataSync_History_SyncDirection") @db.VarChar(50)
+  LastSyncDataDatetimes DateTime?
+  CreateUTC             DateTime         @default(now(), map: "DF_DataSync_History_CreateUTC") @db.DateTime
+  UpdateUTC             DateTime         @default(now(), map: "DF_DataSync_History_UpdateUTC") @db.DateTime
+  Profile_UserInfo      Profile_UserInfo @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_DataSync_History_Profile_UserInfo")
+
+  @@id([UID, SyncStartDate], map: "PK_DataSync_History")
+}
+
+model DataSync_StatusInfo {
+  UID               BigInt           @id(map: "PK_DataSync_StatusInfo")
+  RefreshToken      String           @db.NVarChar(Max)
+  AccessToken       String?          @db.NVarChar(Max)
+  AccessTokenExpiry DateTime?        @db.DateTime
+  IsSync            Boolean          @default(true, map: "DF_DataSync_StatusInfo_isSyncEnabled")
+  NeedToShow        Boolean          @default(false, map: "DF_DataSync_StatusInfo_doNotShowAgain")
+  TermsAgreement    Boolean          @default(false, map: "DF_DataSync_StatusInfo_TermsAgreement")
+  LastDataSyncDate  DateTime         @default(dbgenerated("1996-05-15 00:00:00"), map: "DF_DataSync_StatusInfo_LastDataSyncDate") @db.DateTime
+  CreateUTC         DateTime         @default(now(), map: "DF_DataSync_StatusInfo_CreateUTC") @db.DateTime
+  UpdateUTC         DateTime         @default(now(), map: "DF_DataSync_StatusInfo_UpdateUTC") @db.DateTime
+  Profile_UserInfo  Profile_UserInfo @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_DataSync_Profile_UserInfo")
+}
+
+model DayLog_Record {
+  ID               BigInt           @id(map: "PK_DayLog_Record") @default(autoincrement())
+  UID              BigInt
+  DayLogTypeID     BigInt
+  Value            Int
+  IsHealthConnect  Boolean          @default(false, map: "DEFAULT_DayLog_Record_IsHealthConnect")
+  SourceType       String           @default("Manual", map: "DEFAULT_DayLog_Record_SourceType") @db.VarChar(50)
+  RecordDate       DateTime         @default(dbgenerated("dateadd(hour,(9),getutcdate())"), map: "DEFAULT_DayLog_Record_RecordDate") @db.DateTime
+  CreateUTC        DateTime         @default(dbgenerated("getutcdate()"), map: "DEFAULT_DayLog_Record_CreateUTC") @db.DateTime
+  DayLog_TypeInfo  DayLog_TypeInfo  @relation(fields: [DayLogTypeID], references: [ID], onUpdate: NoAction, map: "FK_DayLog_Record_DayLog_TypeInfo")
+  Profile_UserInfo Profile_UserInfo @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_DayLog_Record_Profile_UserInfo")
+
+  @@index([RecordDate(sort: Desc), UID(sort: Desc), DayLogTypeID], map: "Index_DayLog_Record")
+}
+
+model DayLog_TypeInfo {
+  ID               BigInt            @id(map: "PK_DayLog_TypeInfo")
+  UID              BigInt?
+  TypeName         String            @db.NVarChar(100)
+  TypeColor        String            @default("#3A9D68", map: "DEFAULT_DayLog_TypeInfo_TypeColor") @db.NVarChar(15)
+  TypeStartColor   String            @default("#3A9D68", map: "DEFAULT_DayLog_TypeInfo_TypeStartColor") @db.NVarChar(15)
+  TypeEndColor     String            @default("#3A9D68", map: "DEFAULT_DayLog_TypeInfo_TypeEndColor") @db.NVarChar(15)
+  UiType           String            @default("ring", map: "DEFAULT_DayLog_TypeInfo_UiType") @db.NVarChar(20)
+  IconURL          String?           @db.NVarChar(200)
+  MinValue         Int               @default(0, map: "DEFAULT_DayLog_TypeInfo_MinValue")
+  StepValue        Int               @default(1, map: "DEFAULT_DayLog_TypeInfo_StepValue")
+  UiMaxValue       Int
+  LogMaxValue      Int               @default(-1, map: "DEFAULT_DayLog_TypeInfo_LogMaxValue")
+  CircleMaxValue   Int               @default(-1, map: "DEFAULT_DayLog_TypeInfo_CircleMaxValue")
+  Unit             String?           @db.NVarChar(20)
+  ValueList        String?           @db.NVarChar(Max)
+  IsShown          Boolean           @default(true, map: "DEFAULT_DayLog_TypeInfo_IsShown")
+  CreateUTC        DateTime          @default(dbgenerated("getutcdate()"), map: "DEFAULT_DayLog_TypeInfo_CreateUTC") @db.DateTime
+  DayLog_Record    DayLog_Record[]
+  Profile_UserInfo Profile_UserInfo? @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_DayLog_TypeInfo_Profile_UserInfo")
+}
+
+model Device_FirmwareVersion {
+  ID                 Int      @id(map: "PK_Device_FirmwareVersion") @default(autoincrement())
+  DeviceName         String   @db.VarChar(20)
+  ReleaseDateTimeUtc DateTime
+  FirmwareVersion    String   @db.VarChar(25)
+  FirmwareFileUrl    String   @db.NVarChar(500)
+  ImageVersion       String?  @db.VarChar(25)
+  ImageFileUrl       String?  @db.NVarChar(500)
+  IsRequired         Boolean  @default(false, map: "DEFAULT_Device_FirmwareVersion_IsRequired")
+  UpdateReason       String?  @db.NVarChar(300)
+  CreateUtc          DateTime @default(dbgenerated("getutcdate()"), map: "DEFAULT_Device_FirmwareVersion_CreateUtc")
+  ModifyUtc          DateTime @default(dbgenerated("getutcdate()"), map: "DEFAULT_Device_FirmwareVersion_ModifyUtc")
+}
+
+model HealthConnect_Record {
+  ID                     Int                    @id(map: "PK_HealthData_Record") @default(autoincrement())
+  UID                    BigInt
+  HealthDataTypeID       Int
+  OS                     String                 @db.NVarChar(50)
+  DetailType             String                 @db.NVarChar(100)
+  StartTime              DateTime               @db.DateTime
+  EndTime                DateTime               @db.DateTime
+  Value                  Int
+  CreateUTC              DateTime               @default(dbgenerated("getutcdate()"), map: "DF_HealthData_Record_CreateUTC") @db.DateTime
+  HealthConnect_TypeInfo HealthConnect_TypeInfo @relation(fields: [HealthDataTypeID], references: [ID], onUpdate: NoAction, map: "FK_HealthData_Record_HealthData_TypeInfo")
+  Profile_UserInfo       Profile_UserInfo       @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_HealthData_Record_Profile_UserInfo")
+}
+
+model HealthConnect_TypeInfo {
+  ID                   Int                    @id(map: "PK_HealthData_TypeInfo") @default(autoincrement())
+  TypeName             String                 @db.NVarChar(50)
+  CreateUTC            DateTime               @default(dbgenerated("getutcdate()"), map: "DF_HealthData_TypeInfo_CreateUTC") @db.DateTime
+  HealthConnect_Record HealthConnect_Record[]
+}
+
+model InBodyEveryday_StackHistory {
+  ID               BigInt           @id(map: "PK_InBodyEveryday_StackHistory") @default(autoincrement())
+  UID              BigInt
+  StartMeasuredAt  DateTime
+  LastMeasuredAt   DateTime
+  LastViewedAt     DateTime?
+  CurrentStack     Int              @default(0, map: "DEFAULT_InBodyEveryday_StackHistory_CurrentStack")
+  MaxStack         Int              @default(0, map: "DEFAULT_InBodyEveryday_StackHistory_MaxStack")
+  IsAchieved       Boolean          @default(false, map: "DEFAULT_InBodyEveryday_StackHistory_IsAchieved")
+  IsUsed           Boolean          @default(false, map: "DEFAULT_InBodyEveryday_StackHistory_IsUsed")
+  SerialNumber     String?          @db.VarChar(50)
+  IsInvalid        Boolean          @default(false, map: "DEFAULT_InBodyEveryday_StackHistory_IsInvalid")
+  CreateUTC        DateTime         @default(dbgenerated("getutcdate()"), map: "DEFAULT_InBodyEveryday_StackHistory_CreateUTC")
+  UpdateUTC        DateTime         @default(dbgenerated("getutcdate()"), map: "DEFAULT_InBodyEveryday_StackHistory_UpdateUTC")
+  Profile_UserInfo Profile_UserInfo @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_InBodyEveryday_StackHistory_Profile_UserInfo")
+
+  @@unique([UID(sort: Desc), StartMeasuredAt(sort: Desc)], map: "Index_InBodyEveryday_StackHistory")
+}
+
+model Insight_FitScoreChangeRankingInfo {
+  ID               BigInt            @id(map: "PK_Insight_FitScoreChangeRankingInfo") @default(autoincrement())
+  RankingStartDate DateTime          @db.Date
+  RankingEndDate   DateTime          @db.Date
+  ClusterType      String            @db.NVarChar(100)
+  Rank             Int
+  ChangeValue      Float             @db.Real
+  UID              BigInt?
+  CreateUTC        DateTime          @default(now(), map: "DEFAULT_Insight_FitScoreChangeRankingInfo_CreateUTC")
+  Profile_UserInfo Profile_UserInfo? @relation(fields: [UID], references: [UID], onUpdate: SetNull, map: "FK_Insight_FitScoreChangeRankingInfo_Profile_UserInfo")
+}
+
+model Insight_FitScoreChangeRankingInfoV2 {
+  ID               BigInt            @id(clustered: false, map: "PK_Insight_FitScoreChangeRankingInfoV2") @default(autoincrement())
+  RankingStartDate DateTime          @db.Date
+  RankingEndDate   DateTime          @db.Date
+  ClusterType      String            @db.NVarChar(100)
+  Gender           String            @db.Char(1)
+  AgeGeneration    String            @db.NVarChar(10)
+  Rank             Int
+  ChangeValue      Float             @db.Real
+  UID              BigInt?
+  CreateUTC        DateTime          @default(now(), map: "DEFAULT_Insight_FitScoreChangeRankingInfoV2_CreateUTC")
+  Profile_UserInfo Profile_UserInfo? @relation(fields: [UID], references: [UID], onUpdate: SetNull, map: "FK_Insight_FitScoreChangeRankingInfoV2_Profile_UserInfo")
+
+  @@unique([RankingEndDate, ClusterType, Gender, AgeGeneration, Rank], map: "IX_Insight_FitScoreChangeRankingInfoV2_Composite", clustered: true)
+}
+
+model Insight_QuizAnswerInfo {
+  UID                  BigInt
+  QuizID               Int
+  AnswerKeys           String               @db.NVarChar(50)
+  AnswerValues         String               @db.NVarChar(500)
+  CorrectAnswerValues  String               @db.NVarChar(500)
+  IsCorrect            Boolean
+  CreateUTC            DateTime             @default(dbgenerated("getutcdate()"), map: "DEFAULT_Insight_QuizAnswerInfo_CreateUTC")
+  Insight_QuizMainInfo Insight_QuizMainInfo @relation(fields: [QuizID], references: [ID], onDelete: Cascade, map: "FK_Insight_QuizAnswerInfo_Insight_QuizMainInfo_1")
+  Profile_UserInfo     Profile_UserInfo     @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_Insight_QuizAnswerInfo_Profile_UserInfo")
+
+  @@id([UID, QuizID], map: "PK_Insight_QuizAnswerInfo")
+}
+
+model Insight_QuizChoiceInfo {
+  QuizID      Int
+  AnswerKey   Int    @default(0, map: "DEFAULT_Insight_QuizChoiceInfo_AnswerKey")
+  AnswerValue String @db.NVarChar(200)
+  ChoiceCount Int    @default(0, map: "DEFAULT_Insight_QuizChoiceInfo_ChoiceCount")
+
+  @@id([QuizID, AnswerKey], map: "PK_Insight_QuizChoiceInfo")
+}
+
+model Insight_QuizMainInfo {
+  ID                     Int                      @id(map: "PK_Insight_QuizQuestionInfo")
+  Question               String                   @db.NVarChar(Max)
+  Category               String                   @db.NVarChar(50)
+  Hint                   String?                  @db.NVarChar(Max)
+  AnswerType             String                   @db.NVarChar(100)
+  CorrectAnswer          String                   @db.NVarChar(100)
+  AnswerComment          String?                  @db.NVarChar(Max)
+  TestTypeID             String                   @db.NVarChar(50)
+  IsDeploying            Boolean                  @default(true, map: "DEFAULT_Insight_QuizQuestionInfo_IsDeploy")
+  CreateUTC              DateTime?                @default(dbgenerated("getutcdate()"), map: "DEFAULT_Insight_QuizQuestionInfo_CreateUTC")
+  Insight_QuizAnswerInfo Insight_QuizAnswerInfo[]
+}
+
+model Insight_RecommendArticleSetInfo {
+  ID                     BigInt                 @id(map: "PK_Insight_RecommendArticleSetInfo") @default(autoincrement())
+  SegmentID              BigInt
+  Title                  String                 @db.NVarChar(500)
+  ArticleIDs             String                 @db.NVarChar(200)
+  Note                   String?                @db.NVarChar(200)
+  CreateUTC              DateTime               @default(dbgenerated("getutcdate()"), map: "DEFAULT_Insight_RecommendArticleSetInfo_CreateUTC")
+  BackOffice_SegmentInfo BackOffice_SegmentInfo @relation(fields: [SegmentID], references: [ID], onUpdate: NoAction, map: "FK_Insight_RecommendArticleSetInfo_BackOffice_SegmentInfo")
+}
+
+model Kes_BoothNumAndSerialNumJoin {
+  BoothNumber  String @db.NVarChar(10)
+  SerialNumber String @db.NVarChar(20)
+
+  @@id([BoothNumber, SerialNumber], map: "PK_Kes_BoothNumAndSerialNumJoin")
+}
+
+model Kes_ClusterMissionContentsInfo {
+  TypeNum                      Int    @id(map: "PK_Kes_ClusterMissionContentsInfo")
+  MissionTitle                 String @db.NVarChar(50)
+  MissionBackgroundDescription String @db.NVarChar(Max)
+  FooterText                   String @db.NVarChar(250)
+}
+
+model Log_UserInteractionEnviromentState {
+  UID              BigInt           @id(map: "PK_Log_UserInteractionEnviromentState")
+  OS               String           @db.NVarChar(50)
+  OSVersion        String           @db.NVarChar(50)
+  Device           String           @db.NVarChar(50)
+  AppVersion       String           @db.NVarChar(50)
+  ViewFontSize     Float            @db.Real
+  Bluetooth        Boolean
+  CreateUTC        DateTime         @default(now(), map: "DF_Log_UserInteractionEnviromentState_CreateUTC") @db.DateTime
+  UpdateUTC        DateTime         @default(now(), map: "DF_Log_UserInteractionEnviromentState_UpdateUTC") @db.DateTime
+  Profile_UserInfo Profile_UserInfo @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_Log_UserInteractionEnviromentState_Profile_UserInfo")
+}
+
+model Log_UserInteractionHistory {
+  id               BigInt           @default(autoincrement())
+  UID              BigInt
+  AppVersion       String           @db.NVarChar(15)
+  ScreenID         Int
+  ObjectID         Int
+  ActionID         Int
+  ParameterJson    String?          @db.NVarChar(Max)
+  IPAddress        String?          @db.NVarChar(100)
+  TimeStamp        DateTime
+  CreateUTC        DateTime         @default(now(), map: "DEFAULT_NewTable_CreateUTC")
+  Profile_UserInfo Profile_UserInfo @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_Log_UserInteractionHistory_Profile_UserInfo")
+
+  @@id([id, UID], map: "PK_Log_UserInteractionHistory")
+  @@index([UID], map: "Index_Log_UserInteractionHistory_1")
+  @@index([TimeStamp(sort: Desc)], map: "Index_Log_UserInteractionHistory_2")
+}
+
+model Measure_BCofPart {
+  UID              BigInt
+  DATETIMES        DateTime         @db.DateTime
+  LRA              Float            @db.Real
+  LLA              Float            @db.Real
+  LT               Float            @db.Real
+  LRL              Float            @db.Real
+  LLL              Float            @db.Real
+  FRA              Float            @db.Real
+  FLA              Float            @db.Real
+  FT               Float            @db.Real
+  FRL              Float            @db.Real
+  FLL              Float            @db.Real
+  WWRA             Float?           @db.Real
+  WWLA             Float?           @db.Real
+  WWT              Float?           @db.Real
+  WWRL             Float?           @db.Real
+  WWLL             Float?           @db.Real
+  ICWRA            Float?           @db.Real
+  ICWLA            Float?           @db.Real
+  ICWTR            Float?           @db.Real
+  ICWRL            Float?           @db.Real
+  ICWLL            Float?           @db.Real
+  ECWRA            Float?           @db.Real
+  ECWLA            Float?           @db.Real
+  ECWTR            Float?           @db.Real
+  ECWRL            Float?           @db.Real
+  ECWLL            Float?           @db.Real
+  WEDRA            Float?           @db.Real
+  WEDLA            Float?           @db.Real
+  WEDT             Float?           @db.Real
+  WEDRL            Float?           @db.Real
+  WEDLL            Float?           @db.Real
+  PILRA            Float?           @db.Real
+  PILLA            Float?           @db.Real
+  PILT             Float?           @db.Real
+  PILRL            Float?           @db.Real
+  PILLL            Float?           @db.Real
+  PFRA             Float?           @db.Real
+  PFLA             Float?           @db.Real
+  PFT              Float?           @db.Real
+  PFRL             Float?           @db.Real
+  PFLL             Float?           @db.Real
+  Measure_DataInfo Measure_DataInfo @relation(fields: [UID, DATETIMES], references: [UID, DATETIMES], onDelete: Cascade, map: "FK_Measure_BCofPart_Measure_DataInfo")
+
+  @@id([UID, DATETIMES], map: "PK_Measure_BCofPart")
+  @@index([UID, DATETIMES(sort: Desc)], map: "Index_UID_DATETIMES")
+}
+
+model Measure_BodyComposition {
+  UID              BigInt
+  DATETIMES        DateTime         @db.DateTime
+  WT               Float            @db.Real
+  HT               Float            @db.Real
+  FFM              Float            @db.Real
+  SMM              Float            @db.Real
+  SLM              Float            @db.Real
+  BFM              Float            @db.Real
+  BMI              Float            @db.Real
+  PBF              Float            @db.Real
+  TBW              Float            @db.Real
+  ICW              Float            @db.Real
+  ECW              Float            @db.Real
+  Protein          Float            @db.Real
+  Mineral          Float            @db.Real
+  WED              Float            @db.Real
+  BMR              Float            @db.Real
+  VFA              Float            @db.Real
+  WHR              Float            @db.Real
+  BMC              Float            @db.Real
+  BCM              Float            @default(0, map: "DF_Measure_BodyComposition_BCM") @db.Real
+  FFMI             Float            @db.Real
+  BFMI             Float            @db.Real
+  Measure_DataInfo Measure_DataInfo @relation(fields: [UID, DATETIMES], references: [UID, DATETIMES], onDelete: Cascade, map: "FK_Measure_BodyComposition_Measure_DataInfo")
+
+  @@id([UID, DATETIMES], map: "PK_Measure_BodyComposition")
+  @@index([UID, DATETIMES(sort: Desc)], map: "Index_UID_DATETIMES")
+}
+
+model Measure_BodycompPercentileInfo {
+  UID              BigInt
+  DATETIMES        DateTime         @db.DateTime
+  FilterGender     String           @db.Char(1)
+  FilterAge        Int
+  FilterHT         Int
+  FilterWT         Int
+  FitScore         Float            @db.Real
+  WT               Float            @db.Real
+  SMM              Float            @db.Real
+  PBF              Float            @db.Real
+  BFM              Float            @db.Real
+  VFA              Float            @db.Real
+  WHR              Float            @db.Real
+  SLM              Float            @db.Real
+  BMR              Float            @db.Real
+  BMI              Float            @db.Real
+  HT               Float            @db.Real
+  CreateUTC        DateTime         @default(now(), map: "DEFAULT_Measure_BodycompPercentileInfo_CreateUTC") @db.DateTime
+  UpdateUTC        DateTime         @default(now(), map: "DEFAULT_Measure_BodycompPercentileInfo_UpdateUTC") @db.DateTime
+  Measure_DataInfo Measure_DataInfo @relation(fields: [UID, DATETIMES], references: [UID, DATETIMES], onDelete: Cascade, map: "FK_MeasureDataInfo")
+
+  @@id([UID, DATETIMES, FilterGender, FilterAge, FilterHT, FilterWT], map: "PK_Measure_BodycompPercentileInfo")
+  @@index([UID, DATETIMES(sort: Desc)], map: "Index_UID_DATETIMES")
+}
+
+model Measure_CalcValueByBC {
+  UID              BigInt
+  DATETIMES        DateTime         @db.DateTime
+  VFALevel         Float            @db.Real
+  ODK              Float            @db.Real
+  WC               Float            @db.Real
+  MC               Float            @db.Real
+  FC               Float            @db.Real
+  TOT_SCORE        Float            @db.Real
+  InBodyScore      Float            @db.Real
+  BalUps           Int?
+  BalLows          Int?
+  BalUls           Int?
+  LegLevel         Int?
+  Measure_DataInfo Measure_DataInfo @relation(fields: [UID, DATETIMES], references: [UID, DATETIMES], onDelete: Cascade, map: "FK_Measure_CalcValueByBC_Measure_DataInfo")
+
+  @@id([UID, DATETIMES], map: "PK_Measure_CalcValueByBC")
+  @@index([UID, DATETIMES(sort: Desc)], map: "Index_UID_DATETIMES")
+}
+
+model Measure_DataInfo {
+  UID                            BigInt                           @default(1, map: "DF_Measure_DataInfo_UID")
+  DATETIMES                      DateTime                         @db.DateTime
+  EQUIP                          String?                          @db.NVarChar(100)
+  EQUIP_SERIAL                   String?                          @db.NVarChar(100)
+  AGE                            Int
+  GENDER                         String                           @db.Char(3)
+  DataInsertDate                 DateTime
+  isDelete                       Boolean                          @default(false, map: "DF_Measure_DataInfo_isDelete")
+  MeasurementSource              String?                          @default("InApp", map: "DEFAULT_Measure_DataInfo_MeasurementSource") @db.VarChar(25)
+  RawData                        String?                          @db.VarChar(1000)
+  CreateUTC                      DateTime                         @default(dbgenerated("getutcdate()"), map: "DF_Measure_DataInfo_CreateUTC") @db.DateTime
+  ModifyUTC                      DateTime                         @default(dbgenerated("getutcdate()"), map: "DF_Measure_DataInfo_ModifyUTC") @db.DateTime
+  Measure_BCofPart               Measure_BCofPart?
+  Measure_BodyComposition        Measure_BodyComposition?
+  Measure_BodycompPercentileInfo Measure_BodycompPercentileInfo[]
+  Measure_CalcValueByBC          Measure_CalcValueByBC?
+  Measure_GrowthData             Measure_GrowthData?
+  Measure_Impedance              Measure_Impedance?
+  Measure_StandardRange          Measure_StandardRange?
+  Measure_StandardRangeOfPart    Measure_StandardRangeOfPart?
+
+  @@id([UID, DATETIMES], map: "PK_Measure_DataInfo")
+  @@index([UID, DATETIMES(sort: Desc), isDelete], map: "Index_UID_DATETIMES_IsDelete")
+}
+
+model Measure_GrowthData {
+  UID              BigInt
+  DATETIMES        DateTime         @db.DateTime
+  WT               Float?           @db.Real
+  HT               Float?           @db.Real
+  Measure_DataInfo Measure_DataInfo @relation(fields: [UID, DATETIMES], references: [UID, DATETIMES], onDelete: Cascade, map: "FK_Measure_GrowthDataForNonAdult_Measure_DataInfo")
+
+  @@id([UID, DATETIMES], map: "PK_Measure_GrowthDataForNonAdult")
+  @@index([UID, DATETIMES(sort: Desc)], map: "Index_UID_DATETIMES")
+}
+
+model Measure_Impedance {
+  UID              BigInt
+  DATETIMES        DateTime         @db.DateTime
+  IRA1             Float?           @db.Real
+  ILA1             Float?           @db.Real
+  IT1              Float?           @db.Real
+  IRL1             Float?           @db.Real
+  ILL1             Float?           @db.Real
+  IRA5             Float?           @db.Real
+  ILA5             Float?           @db.Real
+  IT5              Float?           @db.Real
+  IRL5             Float?           @db.Real
+  ILL5             Float?           @db.Real
+  IRA20            Float?           @db.Real
+  ILA20            Float?           @db.Real
+  IT20             Float?           @db.Real
+  IRL20            Float?           @db.Real
+  ILL20            Float?           @db.Real
+  IRA50            Float?           @db.Real
+  ILA50            Float?           @db.Real
+  IT50             Float?           @db.Real
+  IRL50            Float?           @db.Real
+  ILL50            Float?           @db.Real
+  IRA100           Float?           @db.Real
+  ILA100           Float?           @db.Real
+  IT100            Float?           @db.Real
+  IRL100           Float?           @db.Real
+  ILL100           Float?           @db.Real
+  IRA250           Float?           @db.Real
+  ILA250           Float?           @db.Real
+  IT250            Float?           @db.Real
+  IRL250           Float?           @db.Real
+  ILL250           Float?           @db.Real
+  IRA500           Float?           @db.Real
+  ILA500           Float?           @db.Real
+  IT500            Float?           @db.Real
+  IRL500           Float?           @db.Real
+  ILL500           Float?           @db.Real
+  IRA1M            Float?           @db.Real
+  ILA1M            Float?           @db.Real
+  IT11M            Float?           @db.Real
+  IRL1M            Float?           @db.Real
+  ILL1M            Float?           @db.Real
+  XRA5             Float?           @db.Real
+  XLA5             Float?           @db.Real
+  XTR5             Float?           @db.Real
+  XRL5             Float?           @db.Real
+  XLL5             Float?           @db.Real
+  XRA50            Float?           @db.Real
+  XLA50            Float?           @db.Real
+  XTR50            Float?           @db.Real
+  XRL50            Float?           @db.Real
+  XLL50            Float?           @db.Real
+  XRA250           Float?           @db.Real
+  XLA250           Float?           @db.Real
+  XTR250           Float?           @db.Real
+  XRL250           Float?           @db.Real
+  XLL250           Float?           @db.Real
+  ALGLERA5         Float?           @db.Real
+  ALGLELA5         Float?           @db.Real
+  ALGLET5          Float?           @db.Real
+  ALGLERL5         Float?           @db.Real
+  ALGLELL5         Float?           @db.Real
+  ALGLERA50        Float?           @db.Real
+  ALGLELA50        Float?           @db.Real
+  ALGLET50         Float?           @db.Real
+  ALGLERL50        Float?           @db.Real
+  ALGLELL50        Float?           @db.Real
+  ALGLERA250       Float?           @db.Real
+  ALGLELA250       Float?           @db.Real
+  ALGLET250        Float?           @db.Real
+  ALGLERL250       Float?           @db.Real
+  ALGLELL250       Float?           @db.Real
+  WBPA50           Float?           @db.Real
+  RERA5            Float?           @db.Real
+  RELA5            Float?           @db.Real
+  RET5             Float?           @db.Real
+  RERL5            Float?           @db.Real
+  RELL5            Float?           @db.Real
+  RERA50           Float?           @db.Real
+  RELA50           Float?           @db.Real
+  RET50            Float?           @db.Real
+  RERL50           Float?           @db.Real
+  RELL50           Float?           @db.Real
+  RERA250          Float?           @db.Real
+  RELA250          Float?           @db.Real
+  RET250           Float?           @db.Real
+  RERL250          Float?           @db.Real
+  RELL250          Float?           @db.Real
+  IRA200           Float?           @db.Real
+  ILA200           Float?           @db.Real
+  IT200            Float?           @db.Real
+  IRL200           Float?           @db.Real
+  ILL200           Float?           @db.Real
+  Measure_DataInfo Measure_DataInfo @relation(fields: [UID, DATETIMES], references: [UID, DATETIMES], onDelete: Cascade, map: "FK_Measure_Impedance_Measure_DataInfo")
+
+  @@id([UID, DATETIMES], map: "PK_Measure_Impedance")
+  @@index([UID, DATETIMES(sort: Desc)], map: "Index_UID_DATETIMES")
+}
+
+model Measure_StandardRange {
+  UID              BigInt
+  DATETIMES        DateTime         @db.DateTime
+  BMI_MIN          Float            @db.Real
+  BMI_MAX          Float            @db.Real
+  IBMI             Float?           @db.Real
+  PBF_MIN          Float            @db.Real
+  PBF_MAX          Float            @db.Real
+  IPBF             Float?           @db.Real
+  MINERAL_MIN      Float            @db.Real
+  MINERAL_MAX      Float            @db.Real
+  IMINERAL         Float?           @db.Real
+  PROTEIN_MIN      Float            @db.Real
+  PROTEIN_MAX      Float            @db.Real
+  IPROTEIN         Float?           @db.Real
+  BMC_MIN          Float            @db.Real
+  BMC_MAX          Float            @db.Real
+  IBMC             Float?           @db.Real
+  SLM_MIN          Float            @db.Real
+  SLM_MAX          Float            @db.Real
+  ISLM             Float?           @db.Real
+  WHR_MIN          Float            @db.Real
+  WHR_MAX          Float            @db.Real
+  IWHR             Float?           @db.Real
+  TBW_MIN          Float            @db.Real
+  TBW_MAX          Float            @db.Real
+  OD_MIN           Float            @db.Real
+  OD_MAX           Float            @db.Real
+  WT_MIN           Float?           @db.Real
+  WT_MAX           Float?           @db.Real
+  IWT              Float?           @db.Real
+  BFM_MIN          Float?           @db.Real
+  BFM_MAX          Float?           @db.Real
+  IBFM             Float?           @db.Real
+  SMM_MIN          Float?           @db.Real
+  SMM_MAX          Float?           @db.Real
+  ISMM             Float?           @db.Real
+  ICW_MIN          Float?           @db.Real
+  ICW_MAX          Float?           @db.Real
+  ECW_MIN          Float?           @db.Real
+  ECW_MAX          Float?           @db.Real
+  FFM_MIN          Float?           @db.Real
+  FFM_MAX          Float?           @db.Real
+  BMR_MIN          Float?           @db.Real
+  BMR_MAX          Float?           @db.Real
+  BCM_MIN          Float?           @db.Real
+  BCM_MAX          Float?           @db.Real
+  Measure_DataInfo Measure_DataInfo @relation(fields: [UID, DATETIMES], references: [UID, DATETIMES], onDelete: Cascade, map: "FK_Measure_StandardRange_Measure_DataInfo")
+
+  @@id([UID, DATETIMES], map: "PK_Measure_StandardRange")
+  @@index([UID, DATETIMES(sort: Desc)], map: "Index_UID_DATETIMES")
+}
+
+model Measure_StandardRangeOfPart {
+  UID              BigInt
+  DATETIMES        DateTime         @db.DateTime
+  LA_MIN           Float?           @db.Real
+  LA_MAX           Float?           @db.Real
+  LT_MIN           Float?           @db.Real
+  LT_MAX           Float?           @db.Real
+  LL_MIN           Float?           @db.Real
+  LL_MAX           Float?           @db.Real
+  WWA_MIN          Float?           @db.Real
+  WWA_MAX          Float?           @db.Real
+  WWT_MIN          Float?           @db.Real
+  WWT_MAX          Float?           @db.Real
+  WWL_MIN          Float?           @db.Real
+  WWL_MAX          Float?           @db.Real
+  IICWA_MIN        Float?           @db.Real
+  IICWA_MAX        Float?           @db.Real
+  IICWTR_MIN       Float?           @db.Real
+  IICWTR_MAX       Float?           @db.Real
+  IICWL_MIN        Float?           @db.Real
+  IICWL_MAX        Float?           @db.Real
+  IECWA_MIN        Float?           @db.Real
+  IECWA_MAX        Float?           @db.Real
+  IECWTR_MIN       Float?           @db.Real
+  IECWTR_MAX       Float?           @db.Real
+  IECWL_MIN        Float?           @db.Real
+  IECWL_MAX        Float?           @db.Real
+  Measure_DataInfo Measure_DataInfo @relation(fields: [UID, DATETIMES], references: [UID, DATETIMES], onDelete: Cascade, map: "FK_Measure_StandardRangeOfPart_Measure_DataInfo")
+
+  @@id([UID, DATETIMES], map: "PK_Measure_StandardRangeOfPart")
+  @@index([UID, DATETIMES(sort: Desc)], map: "Index_UID_DATETIMES")
+}
+
+model MeasureComment_ContentsInfo {
+  ID                     Int                      @id(map: "PK_MeasureComment_ContentsInfo")
+  LogicCategory          String                   @db.NVarChar(100)
+  LogicKey               String                   @db.NVarChar(100)
+  Title                  String?                  @db.NVarChar(50)
+  TitleColor             String?                  @db.VarChar(25)
+  Priority               Int?
+  ConditionDescription   String?                  @db.NVarChar(400)
+  CommentOriginal        String                   @db.NVarChar(Max)
+  CommentVariation       String?                  @db.NVarChar(Max)
+  CommentDescription     String?                  @db.NVarChar(500)
+  CoolTime               Int?
+  AdditionalData         String?                  @db.NVarChar(Max)
+  FeedbackTriggerIdList  String?                  @db.VarChar(100)
+  FeedbackValidDays      Int?
+  FeedbackBlockedDays    Int?
+  ReferenceView          String?                  @db.NVarChar(Max)
+  RedirectButton         String?                  @db.NVarChar(Max)
+  IsShownLikeOrDislike   Boolean                  @default(false, map: "DEFAULT_MeasureComment_ContentsInfo_IsShownLikeOrDislike")
+  Version                String?                  @db.NVarChar(20)
+  IsShown                Boolean                  @default(false, map: "DEFAULT_MeasureComment_ContentsInfo_IsShown")
+  IsDeleted              Boolean                  @default(false, map: "DEFAULT_MeasureComment_ContentsInfo_IsDeleted")
+  NotionPageID           String?                  @db.VarChar(100)
+  CreateUTC              DateTime                 @default(dbgenerated("getutcdate()"), map: "DEFAULT_MeasureComment_ContentsInfo_CreateUTC")
+  ModifyUTC              DateTime                 @default(dbgenerated("getutcdate()"), map: "DEFAULT_MeasureComment_ContentsInfo_ModifyUTC")
+  MeasureComment_History MeasureComment_History[]
+}
+
+model MeasureComment_History {
+  UID                         BigInt
+  MeasureDateTime             DateTime                     @db.DateTime
+  ContentsID                  Int?
+  Sentence                    String                       @db.NVarChar(Max)
+  IsShownUserFeedback         Boolean                      @default(false, map: "DEFAULT_MeasureComment_History_IsShownUserFeedback")
+  IsLike                      Boolean?
+  LikeOrDislikeReason         String?                      @db.NVarChar(Max)
+  GenerationMilliseconds      Int?
+  CreateUTC                   DateTime?                    @default(dbgenerated("getutcdate()"), map: "DEFAULT_MeasureComment_History_CreateUTC")
+  MeasureComment_ContentsInfo MeasureComment_ContentsInfo? @relation(fields: [ContentsID], references: [ID], onUpdate: SetNull, map: "FK_MeasureComment_History_MeasureComment_ContentsInfo")
+  Profile_UserInfo            Profile_UserInfo             @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_MeasureComment_History_Profile_UserInfo")
+
+  @@id([UID, MeasureDateTime], map: "PK_MeasureComment_History")
+  @@index([UID, MeasureDateTime(sort: Desc)], map: "Index_UID_MeasureDateTime")
+}
+
+model MeasureComment_MonitoringLogs {
+  Id                Int      @id(map: "PK_MeasureComment_TestResult") @default(autoincrement())
+  ClassType         String   @db.NVarChar(100)
+  MonitoringKey     String?  @db.NVarChar(50)
+  MonitoringLogJson String   @db.NVarChar(Max)
+  Version           String   @db.NVarChar(100)
+  CreateUTC         DateTime @default(dbgenerated("getutcdate()"), map: "DEFAULT_MeasureComment_TestResult_CreateUTC")
+}
+
+model News_ContentsBlockInfo {
+  ParentID      Int
+  BlockIndex    Int
+  BlockType     String        @db.NVarChar(50)
+  Contents      String        @db.NVarChar(Max)
+  CreateUTC     DateTime      @default(now(), map: "DF_News_ContentsBlockInfo_CreateUTC") @db.DateTime
+  UpdateUTC     DateTime      @default(now(), map: "DF_News_ContentsBlockInfo_UpdateUTC") @db.DateTime
+  News_MainInfo News_MainInfo @relation(fields: [ParentID], references: [ID], onDelete: Cascade, map: "FK_News_ContentsBlockInfo_News_MainInfo")
+
+  @@id([ParentID, BlockIndex], map: "PK_News_ContentsBlockInfo")
+}
+
+model News_MainInfo {
+  ID                     Int                      @id(map: "PK_News_MainInfo")
+  IsShown                Boolean
+  IsShownAtDashboard     Boolean
+  DashboardShowStartDate DateTime                 @db.DateTime
+  DashboardShowEndDate   DateTime?                @db.DateTime
+  Datetime               DateTime
+  Title                  String                   @db.NVarChar(Max)
+  SubTitle               String?                  @db.NVarChar(Max)
+  Category               String                   @db.NVarChar(100)
+  CategoryColor          String                   @db.NVarChar(100)
+  ThumbnailURL           String                   @db.NVarChar(50)
+  JsonAboutMoveTo        String?                  @db.NVarChar(Max)
+  AppVersionAndroid      String                   @db.NVarChar(50)
+  AppVersionIOS          String                   @db.NVarChar(50)
+  CreateUTC              DateTime                 @default(now(), map: "DF_News_MainInfo_CreateUTC") @db.DateTime
+  UpdateUTC              DateTime                 @default(now(), map: "DF_News_MainInfo_UpdateUTC") @db.DateTime
+  News_ContentsBlockInfo News_ContentsBlockInfo[]
+  News_UserLoggingInfo   News_UserLoggingInfo[]
+}
+
+model News_UserLoggingInfo {
+  UID              BigInt
+  NewsID           Int
+  ReadCount        Int              @default(0, map: "DF_News_UserLoggingInfo_ReadCount")
+  CreateUTC        DateTime         @default(now(), map: "DF_News_UserLoggingInfo_CreateUTC") @db.DateTime
+  UpdateUTC        DateTime         @default(now(), map: "DF_News_UserLoggingInfo_UpdateUTC") @db.DateTime
+  News_MainInfo    News_MainInfo    @relation(fields: [NewsID], references: [ID], onDelete: Cascade, map: "FK_News_UserLoggingInfo_News_MainInfo")
+  Profile_UserInfo Profile_UserInfo @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_News_UserLoggingInfo_Profile_UserInfo")
+
+  @@id([UID, NewsID], map: "PK_News_UserLoggingInfo")
+}
+
+model Notification_CategoryInfo {
+  NotificationCategoryID Int    @id(map: "PK_Notification_CategoryInfo")
+  CategoryName           String @db.NVarChar(50)
+  LogoIMGURL             String @db.NVarChar(50)
+}
+
+model Notification_DeviceInfo {
+  UID              BigInt
+  DeviceID         String           @db.NVarChar(200)
+  AppName          String           @db.NVarChar(50)
+  AppVersion       String           @db.NVarChar(50)
+  DeviceToken      String           @db.NVarChar(Max)
+  DeviceName       String           @db.NVarChar(50)
+  DeviceModel      String           @db.NVarChar(50)
+  DeviceOSVersion  String           @db.NVarChar(50)
+  OSType           String           @db.NVarChar(50)
+  CreateUTC        DateTime         @default(dbgenerated("getutcdate()"), map: "DF_Notification_DeviceInfo_CreateUTC") @db.DateTime
+  ModifyUTC        DateTime         @default(dbgenerated("getutcdate()"), map: "DF_Notification_DeviceInfo_ModifyUTC") @db.DateTime
+  Profile_UserInfo Profile_UserInfo @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_Notification_DeviceInfo_Profile_UserInfo")
+
+  @@id([UID, DeviceID], map: "PK_Notification_DeviceInfo")
+}
+
+model Notification_PrivateHistory {
+  UID                           BigInt
+  NotificationCategoryID        Int
+  NotificationType              String                          @default("N'private'", map: "DF_Notification_PrivateHistory_NotificationType") @db.NVarChar(50)
+  Title                         String                          @db.NVarChar(50)
+  Message                       String                          @db.NVarChar(Max)
+  AdditionalData                String?                         @db.NVarChar(Max)
+  NotificateDate                DateTime                        @db.DateTime
+  LandingPosition               String                          @db.NVarChar(50)
+  CreateUTC                     DateTime                        @default(now(), map: "DF_Notification_PrivateHistory_CreateUTC") @db.DateTime
+  UpdateUTC                     DateTime                        @default(now(), map: "DF_Notification_PrivateHistory_UpdateUTC") @db.DateTime
+  IsRead                        Boolean                         @default(false, map: "DF__Notificat__IsRea__7F0594DA")
+  NotificationID                BigInt                          @id(clustered: false, map: "PK_Notification_PrivateHistory") @default(autoincrement())
+  TrendReport_PushMessageTarget TrendReport_PushMessageTarget[]
+
+  @@index([UID, NotificateDate], map: "IX_Notification_PrivateHistory_UID_NotificateDate", clustered: true)
+}
+
+model Notification_PublicHistory {
+  NotificationID             BigInt                       @id(map: "PK_Notification_PublicHistory") @default(autoincrement())
+  NotificationCategoryID     Int
+  NotificationType           String                       @default("N'public'", map: "DF_Notification_PublicHistory_NotificationType") @db.NVarChar(50)
+  Title                      String                       @db.NVarChar(50)
+  Message                    String                       @db.NVarChar(Max)
+  AdditionalData             String?                      @db.NVarChar(Max)
+  NotificateDate             DateTime                     @db.DateTime
+  LandingPosition            String                       @db.NVarChar(50)
+  CreateUTC                  DateTime                     @default(now(), map: "DF_Notification_PublicHistory_CreateUTC") @db.DateTime
+  UpdateUTC                  DateTime                     @default(now(), map: "DF_Notification_PublicHistory_UpdateUTC") @db.DateTime
+  BackOffice_PushMessageInfo BackOffice_PushMessageInfo[]
+  Notification_UserReadInfo  Notification_UserReadInfo[]
+}
+
+model Notification_UserReadInfo {
+  UID                        BigInt
+  NotificationID             BigInt
+  IsRead                     Boolean                    @default(false, map: "DF__Notificat__IsRea__02D625BE")
+  CreateUTC                  DateTime                   @default(now(), map: "DF_Notification_UserReadInfo_CreateUTC") @db.DateTime
+  UpdateUTC                  DateTime                   @default(now(), map: "DF_Notification_UserReadInfo_UpdateUTC") @db.DateTime
+  Notification_PublicHistory Notification_PublicHistory @relation(fields: [NotificationID], references: [NotificationID], onUpdate: NoAction, map: "FK_Notification_PublicHistory")
+  Profile_UserInfo           Profile_UserInfo           @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_Profile_UserInfo")
+
+  @@id([UID, NotificationID], map: "PK__Notifica__F7BD64E1E82475E9")
+}
+
+model Pathfinder_CompetitorInfo {
+  ID            BigInt   @id(map: "PK_Pathfinder_CompetitorInfo")
+  Age           Int
+  Gender        String   @db.NVarChar(3)
+  DataNumber    Int
+  startBMIindex Int
+  startPBFindex Int
+  endBMIindex   Int
+  endPBFindex   Int
+  DataType      String   @db.NVarChar(50)
+  CreateUTC     DateTime @default(now(), map: "DF_Pathfinder_CompetitorInfo_CreateUTC") @db.DateTime
+  UpdateUTC     DateTime @default(now(), map: "DF_Pathfinder_CompetitorInfo_UpdateUTC") @db.DateTime
+}
+
+model Pathfinder_CompetitorRealCompInfo {
+  ID        BigInt
+  Datetimes DateTime @db.DateTime
+  HT        Float    @db.Real
+  WT        Float    @db.Real
+  PBF       Float    @db.Real
+  SMM       Float    @db.Real
+  BMI       Float    @db.Real
+  FitScore  Int
+
+  @@id([ID, Datetimes], map: "PK_Pathfinder_CompetitorRealCompInfo")
+}
+
+model Pathfinder_ExpectedSuccessRateAndDurationInfo {
+  ID                  Int      @id(map: "PK_Pathfinder_ExpectedSuccessRateAndDurationInfo")
+  BMIIndex            Int
+  PBFIndex            Int
+  PathType            String   @db.NVarChar(50)
+  SuccessRate         Float    @db.Real
+  AchievementDuration Float    @db.Real
+  CreateUTC           DateTime @default(now(), map: "DF_Pathfinder_ExpectedSuccessRateAndDurationInfo_CreateUTC") @db.DateTime
+  UpdateUTC           DateTime @default(now(), map: "DF_Pathfinder_ExpectedSuccessRateAndDurationInfo_UpdateUTC") @db.DateTime
+}
+
+model Pathfinder_MainInfo {
+  UID                         BigInt
+  UserPlan                    String?   @db.NVarChar(50)
+  FinalGoalCluster            String    @db.NVarChar(50)
+  GoalWTUpperLimit            Float     @db.Real
+  GoalWTUnderLimit            Float     @db.Real
+  GoalPBFUpperLimit           Float     @db.Real
+  GoalPBFUnderLimit           Float     @db.Real
+  GoalSMMUpperLimit           Float     @db.Real
+  GoalSMMUnderLimit           Float     @db.Real
+  GoalFitScoreUpperLimit      Int
+  GoalFitScoreUnderLimit      Int
+  StartClusterID              String    @db.NVarChar(50)
+  StartBMIindex               Int
+  StartPBFindex               Int
+  StartWT                     Float     @db.Real
+  StartPBF                    Float     @db.Real
+  StartSMM                    Float     @db.Real
+  StartFitScore               Int
+  StartDatetime               DateTime  @db.DateTime
+  GoalClusterID               String    @db.NVarChar(50)
+  GoalBMIindex                Int
+  GoalPBFindex                Int
+  GoalWT                      Float     @db.Real
+  GoalPBF                     Float     @db.Real
+  GoalSMM                     Float     @db.Real
+  GoalFitScore                Int
+  WTGoalType                  String?   @db.NVarChar(50)
+  PBFGoalType                 String?   @db.NVarChar(50)
+  SMMGoalType                 String?   @db.NVarChar(50)
+  FItScoreGoalType            String?   @db.NVarChar(50)
+  GoalDatetime                DateTime  @db.DateTime
+  EndClusterID                String?   @db.NVarChar(50)
+  EndBMIindex                 Int?
+  EndPBFindex                 Int?
+  EndWT                       Float?    @db.Real
+  EndPBF                      Float?    @db.Real
+  EndSMM                      Float?    @db.Real
+  EndFitScore                 Int?
+  EndDatetime                 DateTime? @db.DateTime
+  ProgressState               String    @default("N'CONTINUE'", map: "DF_Pathfinder_MainInfo_ProgressState") @db.NVarChar(50)
+  isDelayed                   Boolean   @default(false, map: "DF_Pathfinder_MainInfo_isDelayed")
+  CompetitorUIDListJsonString String    @default("[]", map: "DF_Pathfinder_MainInfo_CompetitorUIDs") @db.NVarChar(Max)
+  CreateUTC                   DateTime  @default(now(), map: "DF_Pathfinder_MainInfo_CreateUTC") @db.DateTime
+  UpdateUTC                   DateTime  @default(now(), map: "DF_Pathfinder_MainInfo_UpdateUTC") @db.DateTime
+
+  @@id([UID, StartDatetime], map: "PK_Pathfinder_MainInfo")
+}
+
+model Plan_DescriptionInfo {
+  PlanID              Int                   @id(map: "PK_Plan_DescriptionInfo")
+  PlanName            String                @db.NVarChar(50)
+  Title               String                @db.NVarChar(Max)
+  Description         String                @db.NVarChar(Max)
+  TitleIMG_URL        String                @db.NVarChar(50)
+  ButtonText          String                @db.NVarChar(50)
+  CreateUTC           DateTime              @default(now(), map: "DF_Plan_DescriptionInfo_CreateUTC") @db.DateTime
+  UpdateUTC           DateTime              @default(now(), map: "DF_Plan_DescriptionInfo_UpdateUTC") @db.DateTime
+  Profile_PlanHistory Profile_PlanHistory[]
+}
+
+model Profile_AuthNumber {
+  ID         BigInt   @id(map: "PK_Profile_AuthNumber") @default(autoincrement())
+  LoginID    String   @db.NVarChar(254)
+  AuthNumber Int
+  CreateUTC  DateTime @default(now(), map: "DF_Profile_AuthNumber_CreateUTC") @db.DateTime
+  UpdateUTC  DateTime @default(now(), map: "DF_Profile_AuthNumber_UpdateUTC") @db.DateTime
+}
+
+model Profile_DeleteAccountReason {
+  LoginID    String   @db.NVarChar(254)
+  DeleteDate DateTime @db.DateTime
+  Reason     String   @db.NVarChar(Max)
+  CreateUTC  DateTime @default(dbgenerated("getutcdate()"), map: "DF_Profile_DeleteAccountReason_CreateUTC") @db.DateTime
+
+  @@id([LoginID, DeleteDate], map: "PK_Profile_DeleteAccountReason")
+}
+
+model Profile_EmailVerificationToken {
+  ID               BigInt    @id(map: "PK__Profile___3214EC2738D3EE14") @default(autoincrement())
+  Email            String    @db.NVarChar(254)
+  Token            String    @db.VarChar(64)
+  Purpose          String    @db.VarChar(20)
+  ExpiresAt        DateTime  @db.DateTime
+  Status           String    @default("Pending", map: "DF__Profile_E__Statu__647D527E") @db.VarChar(20)
+  VerifiedDateTime DateTime? @db.DateTime
+  CreateUTC        DateTime  @default(dbgenerated("getutcdate()"), map: "DF__Profile_E__Creat__63892E45") @db.DateTime
+
+  @@index([Email, Purpose], map: "IX_Email_Purpose")
+  @@index([Token], map: "IX_Token")
+}
+
+model Profile_MainAndSubProfileJoin {
+  MainUID          BigInt
+  SubUID           BigInt
+  CreateUTC        DateTime         @default(dbgenerated("getutcdate()"), map: "DF_Profile_MainAndSubProfileJoin_CreateUTC") @db.DateTime
+  Profile_UserInfo Profile_UserInfo @relation(fields: [MainUID], references: [UID], onDelete: Cascade, map: "FK_Profile_MainAndSubProfileJoin_Profile_UserInfo")
+
+  @@id([MainUID, SubUID], map: "MainSubJoinID")
+}
+
+model Profile_PlanHistory {
+  UID                  BigInt
+  DeclareDate          DateTime             @db.SmallDateTime
+  PlanID               Int
+  isCheckedChangeAlert Boolean              @default(false, map: "DF_Profile_PlanHistory_isCheckedChangeAlert")
+  CreateUTC            DateTime             @default(now(), map: "DF_Profile_PlanHistory_CreateUTC") @db.DateTime
+  UpdateUTC            DateTime             @default(now(), map: "DF_Profile_PlanHistory_UpdateUTC") @db.DateTime
+  Plan_DescriptionInfo Plan_DescriptionInfo @relation(fields: [PlanID], references: [PlanID], onUpdate: NoAction, map: "FK_Profile_PlanHistory_Plan_DescriptionInfo")
+
+  @@id([UID, DeclareDate], map: "PK_Profile_PlanHistory")
+}
+
+model Profile_TempUserInfoFromWeb {
+  UID                                       BigInt                                     @id(clustered: false, map: "PK_Profile_TempUserInfoFromWeb") @default(autoincrement())
+  UUID                                      String                                     @db.NVarChar(256)
+  RegisterTargetID                          BigInt?
+  LoginID                                   String                                     @db.NVarChar(254)
+  DATETIMES                                 DateTime                                   @db.DateTime
+  IsHeadOfficeData                          Boolean                                    @default(false, map: "DEFAULT_Profile_TempUserInfoFromWeb_IsHeadOfficeData")
+  Name                                      String                                     @db.NVarChar(50)
+  SyncDatetimes                             DateTime                                   @db.DateTime
+  Gender                                    String                                     @db.NVarChar(3)
+  Age                                       Int
+  WT                                        Float                                      @db.Real
+  HT                                        Float                                      @db.Real
+  SMM                                       Float                                      @db.Real
+  BMI                                       Float                                      @db.Real
+  PBF                                       Float                                      @db.Real
+  InBodyScore                               Int
+  SMMPercentile                             Float                                      @db.Real
+  PBFPercentile                             Float                                      @db.Real
+  CreateUTC                                 DateTime                                   @default(now(), map: "DEFAULT_Profile_TempUserInfoFromWeb_CreateUTC") @db.DateTime
+  UpdateUTC                                 DateTime                                   @default(now(), map: "DEFAULT_Profile_TempUserInfoFromWeb_UpdateUTC") @db.DateTime
+  Profile_TempUserInfoRegisterTargetFromWeb Profile_TempUserInfoRegisterTargetFromWeb? @relation(fields: [RegisterTargetID], references: [RegisterTargetID], onUpdate: NoAction, map: "FK_Profile_TempUserInfoFromWeb_RegisterTarget")
+  Profile_TempUserTermsInfoFromWeb          Profile_TempUserTermsInfoFromWeb?
+
+  @@unique([LoginID, DATETIMES], map: "UQ_Profile_TempUserInfoFromWeb_LoginID_DATETIMES", clustered: true)
+}
+
+model Profile_TempUserInfoRegisterTargetFromWeb {
+  RegisterTargetID            BigInt                        @id(clustered: false, map: "PK_Profile_TempUserInfoRegisterTargetFromWeb") @default(autoincrement())
+  LoginID                     String                        @db.NVarChar(254)
+  DATETIMES                   DateTime                      @db.DateTime
+  Name                        String                        @db.NVarChar(50)
+  Gender                      String                        @db.NVarChar(3)
+  Age                         Int
+  WT                          Float                         @db.Real
+  HT                          Float                         @db.Real
+  SMM                         Float                         @db.Real
+  BMI                         Float                         @db.Real
+  PBF                         Float                         @db.Real
+  CreateUTC                   DateTime                      @default(now(), map: "DEFAULT_Profile_TempUserInfoRegisterTargetFromWeb_CreateUTC") @db.DateTime
+  UpdateUTC                   DateTime                      @default(now(), map: "DEFAULT_Profile_TempUserInfoRegisterTargetFromWeb_UpdateUTC") @db.DateTime
+  RegisterTargetGuid          String?                       @db.NVarChar(256)
+  Profile_TempUserInfoFromWeb Profile_TempUserInfoFromWeb[]
+
+  @@unique([LoginID, DATETIMES], map: "UQ_Profile_TempUserInfoRegisterTargetFromWeb_LoginID_DATETIMES", clustered: true)
+}
+
+model Profile_TempUserTermsInfoFromWeb {
+  UID                                 BigInt                      @id(map: "PK_Profile_TempUserTermsInfoFromWeb")
+  TermsOfServiceAgreement             Boolean
+  TermsOfServiceAgreementDate         DateTime                    @db.DateTime
+  PersonalInformationAgreement        Boolean
+  PersonalInformationAgreementDate    DateTime                    @db.DateTime
+  SensitiveInfoAgreement              Boolean
+  SensitiveInfoAgreementDate          DateTime                    @db.DateTime
+  LocationInfoAgreement               Boolean
+  LocationInfoAgreementDate           DateTime                    @db.DateTime
+  MarketingNotificationsAgreement     Boolean
+  MarketingNotificationsAgreementDate DateTime                    @db.DateTime
+  CreateUTC                           DateTime                    @default(dbgenerated("getutcdate()"), map: "DF_Profile_TempUserTermsInfoFromWeb_CreateUTC") @db.DateTime
+  ModifyUTC                           DateTime                    @default(dbgenerated("getutcdate()"), map: "DF_Profile_TempUserTermsInfoFromWeb_ModifyUTC") @db.DateTime
+  Profile_TempUserInfoFromWeb         Profile_TempUserInfoFromWeb @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_Profile_TempUserTermsInfoFromWeb_Profile_TempUserInfoFromWeb")
+}
+
+model Profile_TermsInfo {
+  UID                                 BigInt           @id(map: "PK_Profile_TermsInfo")
+  TermsOfServiceAgreement             Boolean
+  TermsOfServiceAgreementDate         DateTime         @db.DateTime
+  PersonalInformationAgreement        Boolean
+  PersonalInformationAgreementDate    DateTime         @db.DateTime
+  SensitiveInfoAgreement              Boolean
+  SensitiveInfoAgreementDate          DateTime         @db.DateTime
+  LocationInfoAgreement               Boolean
+  LocationInfoAgreementDate           DateTime         @db.DateTime
+  MarketingNotificationsAgreement     Boolean
+  MarketingNotificationsAgreementDate DateTime         @db.DateTime
+  CreateUTC                           DateTime         @default(dbgenerated("getutcdate()"), map: "DF_Profile_TermsInfo_CreateUTC") @db.DateTime
+  ModifyUTC                           DateTime         @default(dbgenerated("getutcdate()"), map: "DF_Profile_TermsInfo_ModifyUTC") @db.DateTime
+  Profile_UserInfo                    Profile_UserInfo @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_Profile_TermsInfo_Profile_UserInfo")
+}
+
+model Profile_TrialUserInfo {
+  LoginId                  String   @db.NVarChar(254)
+  Height                   Float    @db.Real
+  Gender                   String   @db.NVarChar(6)
+  Birthday                 DateTime @db.Date
+  MeasureDataJson          String   @db.NVarChar(Max)
+  ClusterRepresentDataJson String   @db.NVarChar(Max)
+  IsMigratedToRegularUser  Boolean  @default(false, map: "DEFAULT_Profile_TrialUserInfo_IsRegistered")
+  SerialNumber             String?  @db.NVarChar(20)
+  CreateUTC                DateTime @default(dbgenerated("getutcdate()"), map: "DEFAULT_Profile_TrialUserInfo_CreateUTC")
+
+  @@id([LoginId, CreateUTC], map: "PK_Profile_TrialUserInfo")
+}
+
+model Profile_UserAdditionalInfo {
+  UID                             BigInt           @id(map: "PK_Profile_UserAdditionalInfo")
+  Age_Recent                      Int?
+  FitScore_Recent                 Int?
+  WT_Recent                       Float?           @db.Real
+  SMM_Recent                      Float?           @db.Real
+  SLM_Recent                      Float?           @db.Real
+  PBF_Recent                      Float?           @db.Real
+  BMI_Recent                      Float?           @db.Real
+  BFM_Recent                      Float?           @db.Real
+  WHR_Recent                      Float?           @db.Real
+  VFL_Recent                      Int?
+  BMR_Recent                      Float?           @db.Real
+  FFMI_Recent                     Float?           @db.Real
+  FFM_Recent                      Float?           @db.Real
+  BFMI_Recent                     Float?           @db.Real
+  Equip_Recent                    String?          @db.NVarChar(100)
+  EquipSerial_Recent              String?          @db.NVarChar(50)
+  FirstMeasureDateTime            DateTime?        @db.DateTime
+  FirmwareVersion                 String?          @db.NVarChar(50)
+  MeasureCount                    Int              @default(0, map: "DEFAULT_Profile_UserAdditionalInfo_MeasureCount")
+  CheckedNotificationListDateTime DateTime         @default(now(), map: "DF__Profile_U__Check__2FA8CC35") @db.DateTime
+  IsShowProPlanTab                Boolean          @default(true, map: "DF_Profile_UserAdditionalInfo_IsShowProPlanTab")
+  Profile_UserInfo                Profile_UserInfo @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_Profile_UserAdditionalInfo_Profile_UserInfo")
+}
+
+model Profile_UserInfo {
+  UID                                   BigInt                                  @id(map: "PK__Profile___C5B19602D1B2B5C0") @default(autoincrement())
+  LoginID                               String                                  @db.NVarChar(50)
+  Email                                 String                                  @default("", map: "DEFAULT_Profile_UserInfo_Email") @db.NVarChar(254)
+  PhoneNumber                           String?                                 @db.VarChar(25)
+  LoginPW                               Bytes
+  EmailVerificationStatus               String?                                 @default("", map: "DEFAULT_Profile_UserInfo_EmailVerificationStatus") @db.VarChar(50)
+  CountryCode                           String                                  @db.NVarChar(10)
+  ProfileType                           String                                  @db.NVarChar(20)
+  Gender                                String                                  @db.Char(1)
+  BirthDay                              DateTime                                @db.Date
+  Height                                Float                                   @db.Real
+  Name                                  String                                  @db.NVarChar(100)
+  ProfileIMG_URL                        String                                  @db.NVarChar(Max)
+  CreateAccountDate                     DateTime                                @db.DateTime
+  RecentMeasureDate                     DateTime?                               @db.SmallDateTime
+  RecentLoginDate                       DateTime?                               @db.SmallDateTime
+  CreateUTC                             DateTime                                @default(dbgenerated("getutcdate()"), map: "DF_Profile_UserInfo_CreateUTC") @db.DateTime
+  ModifyUTC                             DateTime                                @default(dbgenerated("getutcdate()"), map: "DF_Profile_UserInfo_ModifyUTC") @db.DateTime
+  Achievements_Record                   Achievements_Record[]
+  Article_ImpressionReachInfo           Article_ImpressionReachInfo[]
+  Article_OnboardingUserInfo            Article_OnboardingUserInfo?
+  Article_UserLoggingInfo               Article_UserLoggingInfo[]
+  Article_UserQuestionInfo              Article_UserQuestionInfo[]
+  BackOffice_SegmentInfo                BackOffice_SegmentInfo[]
+  Cluster_DeclareHistory                Cluster_DeclareHistory[]
+  CustomLearning_UserAnswerLoggingInfo  CustomLearning_UserAnswerLoggingInfo[]
+  DashBoard_InBodyEveryDayApplyInfo     DashBoard_InBodyEveryDayApplyInfo?
+  DashBoard_InBodyEveryDayDrawEventInfo DashBoard_InBodyEveryDayDrawEventInfo[]
+  DashBoard_InBodyEveryDayHistory       DashBoard_InBodyEveryDayHistory[]
+  Dashboard_UserInfoAndSimpleBannerJoin Dashboard_UserInfoAndSimpleBannerJoin[]
+  DataSync_History                      DataSync_History[]
+  DataSync_StatusInfo                   DataSync_StatusInfo?
+  DayLog_Record                         DayLog_Record[]
+  DayLog_TypeInfo                       DayLog_TypeInfo[]
+  HealthConnect_Record                  HealthConnect_Record[]
+  InBodyEveryday_StackHistory           InBodyEveryday_StackHistory[]
+  Insight_FitScoreChangeRankingInfo     Insight_FitScoreChangeRankingInfo[]
+  Insight_FitScoreChangeRankingInfoV2   Insight_FitScoreChangeRankingInfoV2[]
+  Insight_QuizAnswerInfo                Insight_QuizAnswerInfo[]
+  Log_UserInteractionEnviromentState    Log_UserInteractionEnviromentState?
+  Log_UserInteractionHistory            Log_UserInteractionHistory[]
+  MeasureComment_History                MeasureComment_History[]
+  News_UserLoggingInfo                  News_UserLoggingInfo[]
+  Notification_DeviceInfo               Notification_DeviceInfo[]
+  Notification_UserReadInfo             Notification_UserReadInfo[]
+  Profile_MainAndSubProfileJoin         Profile_MainAndSubProfileJoin[]
+  Profile_TermsInfo                     Profile_TermsInfo?
+  Profile_UserAdditionalInfo            Profile_UserAdditionalInfo?
+  Recap_Content                         Recap_Content[]
+  Recap_QaDataSet                       Recap_QaDataSet[]
+  Recap_Share                           Recap_Share[]
+  Setting_UserDeviceInfo                Setting_UserDeviceInfo[]
+  Subscription_UserInfo                 Subscription_UserInfo[]
+  TrendReading_MentionHistory           TrendReading_MentionHistory[]
+  user_allergy                          user_allergy[]
+  user_diet                             user_diet[]
+  user_disease                          user_disease[]
+  user_exercise                         user_exercise[]
+  user_goal_from_chat                   user_goal_from_chat[]
+  user_sleep                            user_sleep[]
+  user_traits                           user_traits[]
+  user_water_intake                     user_water_intake[]
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Profile_UserPlanInfo {
+  PlanID    Int
+  PlanName  String  @db.NVarChar(50)
+  UnderAge  Int
+  UpperAge  Int
+  ClusterID String? @db.NVarChar(50)
+
+  @@ignore
+}
+
+model Recap_BigData_InBodyChange {
+  ID                    Int    @id(map: "PK_RECAP_BIGDATA_INBODYCHANGE") @default(autoincrement())
+  AgeRange              String @db.NVarChar(10)
+  Gender                String @db.NVarChar(10)
+  BodyComp              String @db.NVarChar(50)
+  TrendType             String @db.NVarChar(100)
+  TrendTypeAverageValue Float  @db.Real
+  UserRatio             Float  @db.Real
+}
+
+model Recap_ClusterAverageMonthMeasureCount {
+  ID                                               BigInt                                             @id(map: "PK_RECAP_CLUSTERAVERAGEMONTHMEASURECOUNT")
+  Year                                             Int
+  ClusterID                                        String                                             @db.NVarChar(100)
+  AverageMonthMeasureCount                         Float?                                             @db.Real
+  Recap_ClusterAverageMonthMeasureCount_FilterInfo Recap_ClusterAverageMonthMeasureCount_FilterInfo[]
+}
+
+model Recap_ClusterAverageMonthMeasureCount_FilterInfo {
+  ID                                    BigInt                                @id(map: "PK_RECAP_CLUSTERAVERAGEMONTHMEASURECOUNT_FILTERINFO")
+  ClusterAverageMonthMeasureCountID     BigInt
+  FilterKey                             String?                               @db.NVarChar(255)
+  FilterValue                           String?                               @db.NVarChar(255)
+  Recap_ClusterAverageMonthMeasureCount Recap_ClusterAverageMonthMeasureCount @relation(fields: [ClusterAverageMonthMeasureCountID], references: [ID], onUpdate: NoAction, map: "FK_Recap_ClusterAverageMonthMeasureCount_TO_Recap_ClusterAverageMonthMeasureCount_FilterInfo_1")
+}
+
+model Recap_ClusterGoalList {
+  ID                   BigInt @id(map: "PK_RECAP_CLUSTERGOALLIST")
+  ClusterID            String @db.NVarChar(100)
+  GoalCluster_Basic    String @db.NVarChar(100)
+  GoalCluster_Advanced String @db.NVarChar(100)
+}
+
+model Recap_ClusterTransitionProbability {
+  ID                                            BigInt                                          @id(map: "PK_RECAP_CLUSTERTRANSITIONPROBABILITY")
+  Year                                          Int
+  StartClusterID                                String                                          @db.NVarChar(100)
+  TotalCount                                    Int?
+  FirstClusterID                                String?                                         @db.NVarChar(100)
+  FirstClusterIDRatio                           Float?                                          @db.Real
+  SecondClusterID                               String?                                         @db.NVarChar(100)
+  SecondClusterIDRatio                          Float?                                          @db.Real
+  ThirdClusterID                                String?                                         @db.NVarChar(100)
+  ThirdClusterIDRatio                           Float?                                          @db.Real
+  FourthClusterID                               String?                                         @db.NVarChar(100)
+  FourthClusterIDRatio                          Float?                                          @db.Real
+  FirstClusterCount                             Int?
+  SecondClusterCount                            Int?
+  ThirdClusterCount                             Int?
+  FourthClusterCount                            Int?
+  Recap_ClusterTransitionProbability_FilterInfo Recap_ClusterTransitionProbability_FilterInfo[]
+}
+
+model Recap_ClusterTransitionProbability_FilterInfo {
+  ID                                 BigInt                             @id(map: "PK_RECAP_CLUSTERTRANSITIONPROBABILITY_FILTERINFO")
+  ClusterTransitionProbabilityID     BigInt
+  FilterKey                          String?                            @db.NVarChar(255)
+  FilterValue                        String?                            @db.NVarChar(255)
+  Recap_ClusterTransitionProbability Recap_ClusterTransitionProbability @relation(fields: [ClusterTransitionProbabilityID], references: [ID], onUpdate: NoAction, map: "FK_Recap_ClusterTransitionProbability_TO_Recap_ClusterTransitionProbability_FilterInfo_1")
+}
+
+model Recap_Content {
+  ID               BigInt           @id(map: "PK_Recap_Content") @default(autoincrement())
+  RecapModuleID    BigInt
+  UID              BigInt
+  Version          Int              @default(1, map: "DF_Recap_Content_Version")
+  PayloadJson      String           @db.NVarChar(Max)
+  QueryVariable    String?          @db.NVarChar(Max)
+  ErrorMessage     String?          @db.NVarChar(4000)
+  IsRead           Boolean
+  IsPublish        Boolean          @default(false, map: "DF_Recap_Content_IsPublish")
+  CreateUTC        DateTime         @default(dbgenerated("sysutcdatetime()"), map: "DF_Recap_Content_CreateUTC") @db.DateTimeOffset
+  ModifyUTC        DateTime         @default(dbgenerated("sysutcdatetime()"), map: "DF_Recap_Content_ModifyUTC") @db.DateTimeOffset
+  Recap_Module     Recap_Module     @relation(fields: [RecapModuleID], references: [ID], onUpdate: NoAction, map: "FK_Recap_Content_Recap_Module")
+  Profile_UserInfo Profile_UserInfo @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_Recap_Content_UserInfo")
+  Recap_Share      Recap_Share[]
+
+  @@unique([UID, RecapModuleID, Version], map: "UX_Recap_Content_UID_RecapModuleID_Version")
+  @@index([RecapModuleID, UID, IsPublish], map: "IX_Recap_Content_RecapModuleID_UID_IsPublish")
+  @@index([UID, IsPublish], map: "IX_Recap_Content_UID_IsPublish")
+}
+
+model Recap_Edition {
+  ID              BigInt            @id(map: "PK_Recap_Edition") @default(autoincrement())
+  EditionCode     String            @db.NVarChar(100)
+  PeriodUnit      String            @db.NVarChar(50)
+  TargetYear      Int?
+  TargetMonth     Int?
+  IsActive        Boolean           @default(true, map: "DF_Recap_Edition_IsActive")
+  CreateUTC       DateTime          @default(dbgenerated("sysutcdatetime()"), map: "DF_Recap_Edition_CreateUTC") @db.DateTimeOffset
+  ModifyUTC       DateTime          @default(dbgenerated("sysutcdatetime()"), map: "DF_Recap_Edition_ModifyUTC") @db.DateTimeOffset
+  Recap_Module    Recap_Module[]
+  Recap_QaDataSet Recap_QaDataSet[]
+}
+
+model Recap_Highlight_Sentence {
+  HighlightCode       String  @db.NVarChar(100)
+  MainBodyComp        String  @db.NVarChar(50)
+  Tag                 String? @db.NVarChar(Max)
+  MainTitle           String  @db.NVarChar(Max)
+  Description         String  @db.NVarChar(Max)
+  OptionalDescription String? @db.NVarChar(Max)
+  Priority            Int
+  Condition           String? @db.NVarChar(Max)
+
+  @@id([HighlightCode, MainBodyComp], map: "PK_Recap_Highlight_Sentence")
+}
+
+model Recap_HistogramInfo_RawDelta {
+  Gender        String @db.NVarChar(10)
+  Age           Int
+  BodyType      String @db.NVarChar(50)
+  BodyComp      String @db.NVarChar(50)
+  CountMonth    Int
+  HistogramInfo String @db.NVarChar(Max)
+
+  @@id([Gender, Age, BodyType, BodyComp, CountMonth], map: "PK_Recap_HistogramInfo_RawDelta")
+}
+
+model Recap_HistogramInfo_SmoothDelta {
+  Gender        String @db.NVarChar(10)
+  Age           Int
+  BodyType      String @db.NVarChar(50)
+  BodyComp      String @db.NVarChar(50)
+  CountMonth    Int
+  HistogramInfo String @db.NVarChar(Max)
+
+  @@id([Gender, Age, BodyType, BodyComp, CountMonth], map: "PK_Recap_HistogramInfo_SmoothDelta")
+}
+
+model Recap_MeasurePattern_Sentence {
+  MeasureType        String  @id(map: "PK_Recap_MeasurePattern_Sentence") @db.NVarChar(50)
+  MeasureTitle       String  @db.NVarChar(100)
+  MeasureDescription String  @db.NVarChar(Max)
+  Condition          String? @db.NVarChar(Max)
+}
+
+model Recap_Module {
+  ID             BigInt          @id(map: "PK_Recap_Module") @default(autoincrement())
+  RecapEditionID BigInt
+  ModuleCode     String          @db.NVarChar(100)
+  Name           String          @db.NVarChar(255)
+  Description    String?         @db.NVarChar(4000)
+  ViewOrder      Int
+  CreateUTC      DateTime        @default(dbgenerated("sysutcdatetime()"), map: "DF_Recap_Module_CreateUTC") @db.DateTimeOffset
+  ModifyUTC      DateTime        @default(dbgenerated("sysutcdatetime()"), map: "DF_Recap_Module_ModifyUTC") @db.DateTimeOffset
+  Recap_Content  Recap_Content[]
+  Recap_Edition  Recap_Edition   @relation(fields: [RecapEditionID], references: [ID], onUpdate: NoAction, map: "FK_Recap_Module_Recap_Edition")
+
+  @@unique([RecapEditionID, ModuleCode], map: "UX_Recap_Module_RecapEditionID_ModuleCode")
+  @@index([RecapEditionID, ViewOrder], map: "IX_Recap_Module_RecapEditionID_ViewOrder")
+}
+
+model Recap_PathfinderSuccessProbability {
+  ID                                            BigInt                                          @id(map: "PK_RECAP_PATHFINDERSUCCESSPROBABILITY")
+  Year                                          Int
+  ClusterID                                     String                                          @db.NVarChar(100)
+  SuccessProbability                            Float                                           @db.Real
+  Recap_PathfinderSuccessProbability_FilterInfo Recap_PathfinderSuccessProbability_FilterInfo[]
+}
+
+model Recap_PathfinderSuccessProbability_FilterInfo {
+  ID                                 BigInt                             @id(map: "PK_RECAP_PATHFINDERSUCCESSPROBABILITY_FILTERINFO")
+  PathfinderSuccessProbabilityID     BigInt
+  FilterKey                          String?                            @db.NVarChar(255)
+  FilterValue                        String?                            @db.NVarChar(255)
+  Recap_PathfinderSuccessProbability Recap_PathfinderSuccessProbability @relation(fields: [PathfinderSuccessProbabilityID], references: [ID], onUpdate: NoAction, map: "FK_Recap_PathfinderSuccessProbability_TO_Recap_PathfinderSuccessProbability_FilterInfo_1")
+}
+
+model Recap_QA_ContentsInfo {
+  UID                 BigInt    @id(map: "PK_RECAP_QA_CONTENTSINFO")
+  Age                 Int
+  StartClusterID      String?   @db.NVarChar(255)
+  EndClusterID        String?   @db.NVarChar(255)
+  YearlyTrend         String?   @db.NVarChar(255)
+  IsSeasonalTrend     Boolean?
+  IsYearEndMonth      Boolean?
+  Highlight           String?   @db.NVarChar(Max)
+  MeasurePattern      String?   @db.NVarChar(255)
+  MeasureSummaryCode  String?   @db.NVarChar(255)
+  BodyCompSummaryCode String?   @db.NVarChar(255)
+  FirstMeasureDate    DateTime?
+  LastMeasureDate     DateTime?
+  TotalNumMeasure     Int?
+}
+
+model Recap_QaDataSet {
+  ID               BigInt           @id(map: "PK_Recap_QaDataSet") @default(autoincrement())
+  UID              BigInt
+  RecapEditionID   BigInt
+  Title            String           @db.NVarChar(255)
+  Description      String?          @db.NVarChar(4000)
+  CreateUTC        DateTime         @default(dbgenerated("sysutcdatetime()"), map: "DF_Recap_QaDataSet_CreateUTC") @db.DateTimeOffset
+  ModifyUTC        DateTime         @default(dbgenerated("sysutcdatetime()"), map: "DF_Recap_QaDataSet_ModifyUTC") @db.DateTimeOffset
+  Recap_Edition    Recap_Edition    @relation(fields: [RecapEditionID], references: [ID], onUpdate: NoAction, map: "FK_Recap_QaDataSet_Recap_Edition")
+  Profile_UserInfo Profile_UserInfo @relation(fields: [UID], references: [UID], onUpdate: NoAction, map: "FK_Recap_QaDataSet_UserInfo")
+}
+
+model Recap_Share {
+  ID               BigInt           @id(map: "PK_Recap_Share") @default(autoincrement())
+  UID              BigInt
+  RecapContentID   BigInt
+  CreateUTC        DateTime         @default(dbgenerated("sysutcdatetime()"), map: "DF_Recap_Share_CreateUTC") @db.DateTimeOffset
+  ModifyUTC        DateTime         @default(dbgenerated("sysutcdatetime()"), map: "DF_Recap_Share_ModifyUTC") @db.DateTimeOffset
+  Profile_UserInfo Profile_UserInfo @relation(fields: [UID], references: [UID], onUpdate: NoAction, map: "FK_Recap_Share_UserInfo")
+  Recap_Content    Recap_Content    @relation(fields: [RecapContentID], references: [ID], onDelete: Cascade, onUpdate: NoAction, map: "FK_RecapShare_RecapContent")
+
+  @@index([RecapContentID], map: "IX_RecapShare_RecapContentID")
+}
+
+model Recap_Summary_Sentence {
+  ID                       Int      @id(map: "PK_RECAP_SUMMARY_SENTENCE") @default(autoincrement())
+  SummaryType              String   @db.NVarChar(100)
+  IsTrendPatternActive     Boolean
+  TrendPatternEvaluation   String?  @db.NVarChar(30)
+  MeasurePatternEvaluation String?  @db.NVarChar(30)
+  MeasureType              String?  @db.NVarChar(100)
+  IsHighlightActive        Boolean?
+  MainBodyComp             String?  @db.NVarChar(100)
+  MainBodyCompTrend        String?  @db.NVarChar(100)
+  LastClusterClass         String?  @db.NVarChar(10)
+  HighlightCode            String?  @db.NVarChar(100)
+  SummarySentence          String   @db.NVarChar(Max)
+  SummaryCode              String?  @db.NVarChar(255)
+  StickerCode              String?  @db.NVarChar(255)
+}
+
+model Recap_TrendPattern_MilestoneTrendSentence {
+  MainBodyComp           String  @db.NVarChar(50)
+  MainBodyCompTrendType  String  @db.NVarChar(50)
+  MainBodyCompEvaluation String  @db.NVarChar(50)
+  IsSeasonalPeriod       Boolean
+  IsYearEndMonth         Boolean
+  MainTitle              String  @db.NVarChar(Max)
+  Description            String  @db.NVarChar(Max)
+
+  @@id([MainBodyComp, MainBodyCompTrendType, MainBodyCompEvaluation, IsSeasonalPeriod, IsYearEndMonth], map: "PK_Recap_TrendPattern_MilestoneTrendSentence")
+}
+
+model Recap_TrendPattern_YearlyTrendSentence {
+  FitscoreTrend          String  @db.NVarChar(50)
+  MainBodyComp           String  @db.NVarChar(50)
+  MainBodyCompTrendType  String  @db.NVarChar(50)
+  MainBodyCompEvaluation String  @db.NVarChar(50)
+  ChangeAmount           String  @db.NVarChar(50)
+  MainTitle              String  @db.NVarChar(Max)
+  Description            String  @db.NVarChar(Max)
+  OptionalDescription    String? @db.NVarChar(Max)
+
+  @@id([FitscoreTrend, MainBodyCompEvaluation, MainBodyCompTrendType, MainBodyComp, ChangeAmount], map: "PK_Recap_TrendPattern_YearlyTrendSentence")
+}
+
+model Setting_1on1Ask {
+  AskID                 BigInt                  @id(map: "PK__Setting___3D29B234ACAEDE00") @default(autoincrement())
+  UID                   BigInt
+  AskType               String                  @db.NVarChar(20)
+  AskContents           String                  @db.NVarChar(Max)
+  AskDate               DateTime                @db.DateTime
+  Answers               String?                 @db.NVarChar(Max)
+  AnswerDate            DateTime?               @db.DateTime
+  isAnswered            Boolean
+  isRead                Boolean
+  AppVersion            String                  @db.NVarChar(30)
+  DeviceModel           String                  @db.NVarChar(30)
+  OSVersion             String                  @db.NVarChar(50)
+  AndroidSDKVersion     String                  @db.NVarChar(50)
+  RecentPaths           String                  @db.NVarChar(Max)
+  SlackThreadTs         String?                 @db.NVarChar(50)
+  CreateUTC             DateTime                @default(dbgenerated("getutcdate()"), map: "DF_Setting_1on1Ask_CreateUTC") @db.DateTime
+  ModifyUTC             DateTime                @default(dbgenerated("getutcdate()"), map: "DF_Setting_1on1Ask_ModifyUTC") @db.DateTime
+  Setting_1on1AskImgURL Setting_1on1AskImgURL[]
+}
+
+model Setting_1on1AskImgURL {
+  AskID           BigInt
+  IMG_Index       BigInt
+  AskIMG_URL      String          @db.NVarChar(200)
+  CreateUTC       DateTime        @default(dbgenerated("getutcdate()"), map: "DF_Setting_1on1AskImgURL_CreateUTC") @db.DateTime
+  Setting_1on1Ask Setting_1on1Ask @relation(fields: [AskID], references: [AskID], onDelete: Cascade, map: "FK_Setting_1on1AskImgURL_Setting_1on1Ask")
+
+  @@id([AskID, IMG_Index], map: "Ask")
+}
+
+model Setting_ApplicationVersionHistory {
+  ID                Int      @id(map: "PK_Setting_ApplicationVersionHistory") @default(autoincrement())
+  ProgramName       String   @db.NVarChar(50)
+  OS                String   @db.NVarChar(50)
+  Version           String   @db.NVarChar(50)
+  isEssentialUpdate Boolean
+  UpdateTitle       String   @db.NVarChar(50)
+  UpdateReason      String   @db.NVarChar(Max)
+  CreateUTC         DateTime @default(now(), map: "DF_Setting_ApplicationVersionHistory_CreateUTC") @db.DateTime
+  UpdateUTC         DateTime @default(now(), map: "DF_Setting_ApplicationVersionHistory_UpdateUTC") @db.DateTime
+}
+
+model Setting_ConnectDeviceInfo {
+  SerialNumber            String                   @id(map: "PK_Setting_ConnectDeviceInfo") @db.NVarChar(25)
+  DeviceName              String                   @db.NVarChar(50)
+  LowPowerMode            String                   @db.NVarChar(25)
+  FirmwareVersion         String                   @db.NVarChar(50)
+  RecentConnectUID        BigInt
+  RecentConnectDeviceDate DateTime                 @db.DateTime
+  Setting_UserDeviceInfo  Setting_UserDeviceInfo[]
+}
+
+model Setting_FAQ {
+  FAQ_ID              Int      @id(map: "PK_Setting_FAQ") @default(autoincrement())
+  IsShown             Boolean  @default(true, map: "DEFAULT_Setting_FAQ_IsShown")
+  Type                String   @db.NVarChar(20)
+  Title               String   @db.NVarChar(Max)
+  Contents            String   @db.NVarChar(Max)
+  ImageURL            String?  @db.VarChar(Max)
+  RedirectButtonsData String?  @db.NVarChar(Max)
+  OrderPriority       Int      @default(9999, map: "DEFAULT_Setting_FAQ_OrderPriority")
+  CreateUTC           DateTime @default(dbgenerated("getutcdate()"), map: "DF_Setting_FAQ_CreateUTC") @db.DateTime
+  ModifyUTC           DateTime @default(dbgenerated("getutcdate()"), map: "DF_Setting_FAQ_ModifyUTC") @db.DateTime
+}
+
+model Setting_FirmwareInfo {
+  ProgramName           String   @id(map: "PK_Setting_FirmwareInfo") @db.NVarChar(50)
+  MinVersion            String   @db.NVarChar(50)
+  LatestVersion         String   @db.NVarChar(50)
+  CurrentVersion        String   @db.NVarChar(50)
+  MinVersionDatetime    DateTime @db.SmallDateTime
+  LatestVersionDatetime DateTime @db.SmallDateTime
+  IsEssentialUpdate     Boolean
+  IsShowMinUpdatePopup  Boolean
+  Filename              String   @db.NVarChar(200)
+  FileURL               String   @db.NVarChar(Max)
+  UpdateReason          String   @db.NVarChar(Max)
+  CreateUTC             DateTime @default(dbgenerated("getutcdate()"), map: "DF_Setting_FirmwareInfo_CreateUTC") @db.DateTime
+  ModifyUTC             DateTime @default(dbgenerated("getutcdate()"), map: "DF_Setting_FirmwareInfo_ModifyUTC") @db.DateTime
+}
+
+model Setting_Notice {
+  ID           Int      @id(map: "PK_Setting_Notice") @default(autoincrement())
+  IsShown      Boolean  @default(true, map: "DEFAULT_Setting_Notice_IsShown")
+  Title        String   @db.NVarChar(Max)
+  Contents     String   @db.NVarChar(Max)
+  RegisterDate DateTime @db.DateTime
+  CreateUTC    DateTime @default(dbgenerated("getutcdate()"), map: "DF_Setting_Notice_CreateUTC") @db.DateTime
+  ModifyUTC    DateTime @default(dbgenerated("getutcdate()"), map: "DF_Setting_Notice_ModifyUTC") @db.DateTime
+}
+
+model Setting_OnBoardingProblemAsk {
+  PhoneNumber           String   @db.NVarChar(20)
+  OnBoardingAskContents String   @db.NVarChar(Max)
+  CreateUTC             DateTime @default(now(), map: "DF_Setting_OnBoardingProblemAsk_CreateUTC") @db.DateTime
+  UpdateUTC             DateTime @default(now(), map: "DF_Setting_OnBoardingProblemAsk_UpdateUTC") @db.DateTime
+  ID                    BigInt   @id(map: "PK_Setting_OnBoardingProblemAsk") @default(autoincrement())
+}
+
+model Setting_ServerMaintenanceInfo {
+  ID                    Int      @id(map: "PK_Setting_ServerMaintenanceInfo")
+  MaintenanceTimeString String   @db.NVarChar(Max)
+  Description           String   @db.NVarChar(Max)
+  CreateUTC             DateTime @default(now(), map: "DEFAULT_Setting_ServerMaintenanceInfo_CreateUTC") @db.DateTime
+  UpdateUTC             DateTime @default(now(), map: "DEFAULT_Setting_ServerMaintenanceInfo_UpdateUTC") @db.DateTime
+}
+
+model Setting_UserDeviceInfo {
+  UID                       BigInt
+  SerialNumber              String                    @db.NVarChar(25)
+  IsDeviceSound             Boolean
+  RecentConnectDeviceDate   DateTime                  @db.DateTime
+  Profile_UserInfo          Profile_UserInfo          @relation(fields: [UID], references: [UID], onDelete: Cascade, onUpdate: NoAction, map: "FK_Setting_UserDeviceInfo_Profile_UserInfo")
+  Setting_ConnectDeviceInfo Setting_ConnectDeviceInfo @relation(fields: [SerialNumber], references: [SerialNumber], onUpdate: NoAction, map: "FK_Setting_UserDeviceInfo_Setting_ConnectDeviceInfo")
+
+  @@id([UID, SerialNumber], map: "PK_Setting_UserDeviceInfo")
+}
+
+model Subscription_BasePlan {
+  BasePlanId        String            @db.NVarChar(50)
+  OfferIdToken      String            @db.NVarChar(200)
+  PriceAmountMicros BigInt
+  PriceCurrencyCode String            @db.NVarChar(50)
+  BillingPeriod     String            @db.NVarChar(50)
+  RecurrenceMode    Int
+  CreateUtc         DateTime          @default(now(), map: "DF_Subscription_BasePlan_CreateUTC") @db.DateTime
+  UpdateUtc         DateTime          @default(now(), map: "DF_Subscription_BasePlan_UpdateUTC") @db.DateTime
+  IsActive          Boolean
+  ProductId         String            @db.NVarChar(50)
+  Subscription_Plan Subscription_Plan @relation(fields: [ProductId], references: [ProductId], onDelete: Cascade, map: "FK_Subscription_BasePlan_Subscription_Plan")
+
+  @@id([ProductId, BasePlanId], map: "PK_Subscription_BasePlan")
+}
+
+model Subscription_Plan {
+  ProductId             String                  @id(map: "PK_Subscription_Plan") @db.NVarChar(50)
+  Type                  String                  @db.NVarChar(50)
+  Title                 String?                 @db.NVarChar(50)
+  Name                  String?                 @db.NVarChar(50)
+  SkuDetailsToken       String?                 @db.NVarChar(200)
+  CreateUtc             DateTime                @default(now(), map: "DF_Subscription_Plan_CreateUTC") @db.DateTime
+  UpdateUtc             DateTime                @default(now(), map: "DF_Subscription_Plan_UpdateUTC") @db.DateTime
+  IsActive              Boolean
+  Subscription_BasePlan Subscription_BasePlan[]
+}
+
+model Subscription_UserInfo {
+  SubscriptionId           BigInt           @id(map: "PK_Subscription_UserInfo") @default(autoincrement())
+  UID                      BigInt
+  ProductId                String           @db.NVarChar(50)
+  PurchaseToken            String           @db.NVarChar(150)
+  PurchaseOS               String?          @default("Android", map: "DF__Subscript__Purch__0DD3A275") @db.NVarChar(50)
+  StartDateTime            DateTime?        @db.DateTime
+  ExpiryDateTime           DateTime?        @db.DateTime
+  IsSubscribing            Boolean          @default(false, map: "DF__Subscript__IsSub__0EC7C6AE")
+  PriceAmountMicros        BigInt?
+  PriceCurrencyCode        String           @db.NVarChar(150)
+  OrderId                  String?          @db.NVarChar(50)
+  SubscriptionStateEnum    String           @default("SUBSCRIPTION_STATE_EXPIRED", map: "DF__Subscript__Subsc__0FBBEAE7") @db.NVarChar(100)
+  LinkedPurchaseToken      String?          @db.NVarChar(150)
+  AcknowledgementStateEnum String?          @db.NVarChar(100)
+  CanceledStateContextEnum String?          @db.NVarChar(100)
+  CancelDateTime           DateTime?        @db.DateTime
+  PauseAutoResumeDateTime  DateTime?        @db.DateTime
+  AutoRenewing             Boolean?
+  CreateUTC                DateTime         @default(dbgenerated("getutcdate()"), map: "DF_Subscription_UserInfo_CreateUTC") @db.DateTime
+  UpdateUTC                DateTime         @default(dbgenerated("getutcdate()"), map: "DF_Subscription_UserInfo_UpdateUTC") @db.DateTime
+  Profile_UserInfo         Profile_UserInfo @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_Subscription_UserInfo_Profile_UserInfo")
+}
+
+model Survey_ChoicesInfo {
+  QuestionID  Int
+  AnswerKey   Int
+  AnswerValue String @db.NVarChar(50)
+  UserCount   Int
+
+  @@id([QuestionID, AnswerKey], map: "PK_Survey_ChoicesInfo_1")
+}
+
+model Survey_MainInfo {
+  ID                  Int                   @id(map: "PK_Survey_MainInfo_1")
+  IntroComment        String                @db.NVarChar(Max)
+  Title               String                @db.NVarChar(Max)
+  SubTitle            String?               @db.NVarChar(Max)
+  OutroComment        String                @db.NVarChar(Max)
+  IsDeploy            Boolean
+  StartDate           DateTime              @db.DateTime
+  EndDate             DateTime              @db.DateTime
+  CreateUTC           DateTime              @default(now(), map: "DF_Survey_MainInfo_CreateUTC") @db.DateTime
+  UpdateUTC           DateTime              @default(now(), map: "DF_Survey_MainInfo_UpdateUTC") @db.DateTime
+  ForWebView          Boolean               @default(false, map: "DF__Survey_Ma__ForWe__4D6417A5")
+  IsForWebView        Boolean               @default(false, map: "DF__Survey_Ma__IsFor__6FF926CB")
+  Survey_QuestionInfo Survey_QuestionInfo[]
+}
+
+model Survey_QuestionInfo {
+  QuestionID      Int             @id(map: "PK_Survey_QuestionInfo")
+  Title           String          @db.NVarChar(Max)
+  SurveyID        Int
+  UIType          String          @db.NVarChar(50)
+  AnswerType      String          @db.NVarChar(100)
+  SubTitle        String?         @db.NVarChar(Max)
+  IsDeploy        Boolean
+  CreateUTC       DateTime        @default(now(), map: "DF_Survey_QuestionInfo_CreateUTC") @db.DateTime
+  UpdateUTC       DateTime        @default(now(), map: "DF_Survey_QuestionInfo_UpdateUTC") @db.DateTime
+  NavigationBar   String?         @db.NVarChar(50)
+  Survey_MainInfo Survey_MainInfo @relation(fields: [SurveyID], references: [ID], onDelete: Cascade, map: "FK_Survey_QuestionInfo_Survey_MainInfo")
+}
+
+model Survey_UserAnswerLoggingInfo {
+  ID                            BigInt                      @id(map: "PK_Survey_UserAnswerLoggingInfo_1") @default(autoincrement())
+  UID                           BigInt
+  QuestionID                    Int
+  AnswerKey                     Int
+  AnswerValue                   String?                     @db.NVarChar(Max)
+  CreateUTC                     DateTime                    @default(now(), map: "DF_Survey_UserAnswerLoggingInfo_CreateUTC_1") @db.DateTime
+  UpdateUTC                     DateTime                    @default(now(), map: "DF_Survey_UserAnswerLoggingInfo_UpdateUTC_1") @db.DateTime
+  Survey_UserMainLoggingInfo_ID BigInt?
+  IsSubmited                    Boolean                     @default(false, map: "DF_Survey_UserAnswerLoggingInfo_IsSubmited")
+  Survey_UserMainLoggingInfo    Survey_UserMainLoggingInfo? @relation(fields: [Survey_UserMainLoggingInfo_ID], references: [MainLoggingInfoID], onDelete: Cascade, map: "FK_Survey_UserAnswerLoggingInfo_Survey_UserMainLoggingInfo")
+}
+
+model Survey_UserMainLoggingInfo {
+  MainLoggingInfoID            BigInt                         @id(map: "PK_UserMainLoggingInfo") @default(autoincrement())
+  UID                          BigInt
+  SurveyId                     Int
+  PhoneNumber                  String                         @db.NVarChar(50)
+  CreateUTC                    DateTime                       @default(now(), map: "DF_Survey_UserMainLoggingInfoo_CreateUTC_1") @db.DateTime
+  UpdateUTC                    DateTime                       @default(now(), map: "DF_Survey_UserMainLoggingInfo_UpdateUTC_1") @db.DateTime
+  Survey_UserAnswerLoggingInfo Survey_UserAnswerLoggingInfo[]
+}
+
+model sysdiagrams {
+  name         String @db.NVarChar(128)
+  principal_id Int
+  diagram_id   Int    @id(map: "PK__sysdiagr__C2B05B61DCC65AD1") @default(autoincrement())
+  version      Int?
+  definition   Bytes?
+
+  @@unique([principal_id, name], map: "UK_principal_name")
+}
+
+model Terms_Type {
+  ID            Int             @id(map: "PK__Terms_Ty__2677DBB91D7FC235") @default(autoincrement())
+  TypeCode      String          @unique(map: "UQ__Terms_Ty__3E1CDC7CA579AC5D") @db.NVarChar(50)
+  TypeName      String          @db.NVarChar(100)
+  IsRequired    Boolean         @default(true, map: "DF__Terms_Typ__IsReq__72AB7644")
+  DisplayOrder  Int
+  CreatedAt     DateTime        @default(dbgenerated("getutcdate()"), map: "DF__Terms_Typ__Creat__7493BEB6")
+  Terms_Version Terms_Version[]
+
+  @@index([DisplayOrder], map: "IX_Terms_Type_Active")
+}
+
+model Terms_UserConsent {
+  ID             BigInt        @id(map: "PK__Terms_Us__7C0F0E42D6190C6B") @default(autoincrement())
+  UID            BigInt
+  TermsVersionId Int
+  IsAgreed       Boolean
+  AgreedAt       DateTime      @default(dbgenerated("getutcdate()"), map: "DF__Terms_Use__Agree__7F114D29")
+  IpAddress      String?       @db.NVarChar(50)
+  UserAgent      String?       @db.NVarChar(500)
+  Terms_Version  Terms_Version @relation(fields: [TermsVersionId], references: [ID], onUpdate: NoAction, map: "FK_Terms_UserConsent_Version")
+
+  @@index([AgreedAt], map: "IX_Terms_UserConsent_AgreedAt")
+  @@index([UID, TermsVersionId, AgreedAt(sort: Desc)], map: "IX_Terms_UserConsent_Latest")
+  @@index([UID, TermsVersionId], map: "IX_Terms_UserConsent_User")
+}
+
+model Terms_Version {
+  ID                Int                 @id(map: "PK__Terms_Ve__DA064FBDFAF16086") @default(autoincrement())
+  TermsTypeId       Int
+  Version           String              @db.NVarChar(20)
+  CountryCode       String              @db.NVarChar(10)
+  LanguageCode      String              @db.NVarChar(10)
+  Title             String              @db.NVarChar(200)
+  Content           String              @db.NVarChar(Max)
+  EffectiveFrom     DateTime
+  IsActive          Boolean             @default(true, map: "DF__Terms_Ver__IsAct__795873D3")
+  CreatedUTC        DateTime            @default(dbgenerated("getutcdate()"), map: "DF__Terms_Ver__Creat__7A4C980C")
+  Terms_UserConsent Terms_UserConsent[]
+  Terms_Type        Terms_Type          @relation(fields: [TermsTypeId], references: [ID], onUpdate: NoAction, map: "FK_Terms_Version_Type")
+
+  @@unique([TermsTypeId, Version, CountryCode, LanguageCode], map: "UQ_Terms_Version_Unique")
+  @@index([TermsTypeId, CountryCode, IsActive, EffectiveFrom], map: "IX_Terms_Version_Active")
+  @@index([CountryCode, LanguageCode, IsActive], map: "IX_Terms_Version_Country")
+}
+
+model Test_Log {
+  logdata   String?   @db.NVarChar(Max)
+  CreateUTC DateTime  @id(map: "PK_Test_Log") @default(now(), map: "DF_Test_Log_CreateUTC") @db.DateTime
+  UPdateUTC DateTime? @default(now(), map: "DF_Test_Log_UPdateUTC") @db.DateTime
+}
+
+model Test_SchemeCompare {
+  column_1 Int      @id(map: "PK_Test_SchemeCompare") @default(autoincrement())
+  column_2 String   @db.NVarChar(50)
+  column_3 DateTime @db.DateTime
+}
+
+model TrendReading_MentionHistory {
+  UID                  BigInt
+  UseDate              DateTime         @db.DateTime
+  MentionID            Int
+  ReUsableDate         DateTime         @db.DateTime
+  MentionTitle         String           @db.NVarChar(Max)
+  MentionContents      String           @db.NVarChar(Max)
+  NotificationType     String           @db.NVarChar(200)
+  LinkedArticleID      Int
+  LinkedInBodyDataID   DateTime         @db.DateTime
+  isDeleteBodycompData Boolean
+  isGood               Boolean
+  isBad                Boolean
+  CreateUTC            DateTime         @default(dbgenerated("getutcdate()"), map: "DF_TrendReading_MentionHistory_CreateUTC") @db.DateTime
+  ModifyUTC            DateTime         @default(dbgenerated("getutcdate()"), map: "DF_TrendReading_MentionHistory_ModifyUTC") @db.DateTime
+  Profile_UserInfo     Profile_UserInfo @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_TrendReading_MentionHistory_Profile_UserInfo")
+
+  @@id([UID, UseDate], map: "PK_TrendReading_MentionHistory")
+}
+
+model TrendReading_MentionInfo {
+  MentionID            Int      @id(map: "PK__TrendRea__5D91623C9D54EC06")
+  Category             String   @db.NVarChar(100)
+  IndexInCategory      Int
+  Priority             Int
+  Cooltime_days        Int
+  PreCondition         String   @db.NVarChar(Max)
+  Condition            String   @db.NVarChar(Max)
+  VariableForCondition String   @db.NVarChar(Max)
+  MentionTitle         String   @db.NVarChar(Max)
+  MentionContents      String   @db.NVarChar(Max)
+  VariableForDisplay   String   @db.NVarChar(Max)
+  NotificationType     String?  @db.NVarChar(100)
+  LinkedArticleID      String?  @db.NVarChar(100)
+  UsingCount           Int
+  GoodCount            Int
+  BadCount             Int
+  CreateUTC            DateTime @default(dbgenerated("getutcdate()"), map: "DF_TrendReading_MentionInfo_CreateUTC") @db.DateTime
+  ModifyUTC            DateTime @default(dbgenerated("getutcdate()"), map: "DF_TrendReading_MentionInfo_ModifyUTC") @db.DateTime
+}
+
+model TrendReading_VariableInfo {
+  VariableID   Int      @id(map: "PK_TrendReading_VariableInfo")
+  VariableName String   @db.NVarChar(Max)
+  VariableTerm String   @db.NVarChar(Max)
+  CreateUTC    DateTime @default(dbgenerated("getutcdate()"), map: "DF_TrendReading_VariableInfo_CreateUTC") @db.DateTime
+  ModifyUTC    DateTime @default(dbgenerated("getutcdate()"), map: "DF_TrendReading_VariableInfo_ModifyUTC") @db.DateTime
+}
+
+model TrendReport_ChunkedData {
+  ChunkID       Int      @id(map: "PK_TrendReport_ChunkedData")
+  UID           BigInt
+  StartDate     DateTime @db.DateTime
+  EndDate       DateTime @db.DateTime
+  BMI_Idx       Int
+  PBF_Idx       Int
+  RawData       String   @db.NVarChar(Max)
+  SmoothedData  String   @db.NVarChar(Max)
+  WTTrend       String   @db.NVarChar(50)
+  SMMTrend      String   @db.NVarChar(50)
+  PBFTrend      String   @db.VarChar(50)
+  FitscoreTrend String   @db.NVarChar(50)
+}
+
+model TrendReport_ContentsInfo_Week {
+  UID                                    BigInt
+  ReportType                             String                                   @db.NVarChar(10)
+  ReportCode                             String                                   @default("'", map: "DF__TrendRepo__Repor__12A3448A") @db.NVarChar(20)
+  GenerationDate                         DateTime                                 @db.DateTime
+  Version                                Int
+  StartDate                              DateTime?                                @db.DateTime
+  EndDate                                DateTime?                                @db.DateTime
+  ReportContents                         String                                   @default("[]", map: "DF_TrendReport_ContentsInfo_ReportContents") @db.NVarChar(Max)
+  QueryVariable                          String?                                  @db.NVarChar(Max)
+  TimeseriesData                         String?                                  @db.NVarChar(Max)
+  IsGenerated                            Boolean?
+  ErrorMessage                           String?                                  @db.NVarChar(Max)
+  EvaluationData                         String?                                  @db.NVarChar(Max)
+  IsConfirmed                            Boolean?
+  IsPublish                              Boolean                                  @default(false, map: "DF_TrendReport_ContentsInfo_Week_IsPublish")
+  ReadCount                              Int                                      @default(0, map: "DF_TrendReport_ContentsInfo_Week_ReadCount")
+  ConfirmMessage                         String?                                  @db.NVarChar(Max)
+  CreateUTC                              DateTime                                 @default(now(), map: "DF_TrendReport_ContentsInfo_CreateUTC") @db.DateTime
+  UpdateUTC                              DateTime                                 @default(now(), map: "DF_TrendReport_ContentsInfo_UpdateUTC") @db.DateTime
+  IsButtonClick                          Boolean                                  @default(false, map: "DF_TrendReport_ContentsInfo_Week_IsButtonClick")
+  ID                                     BigInt                                   @id(clustered: false, map: "PK_TrendReport_ContentsInfo") @default(autoincrement())
+  SharedCount                            Int                                      @default(0, map: "DF_TrendReport_ContentsInfo_Week_SharedCount")
+  IsHumanConfirmed                       Boolean                                  @default(false, map: "DF__TrendRepo__IsHum__462DD588")
+  TrendReport_FeedbackAnswerLoggingInfo_ TrendReport_FeedbackAnswerLoggingInfo_[]
+  TrendReport_PushMessageTarget          TrendReport_PushMessageTarget[]
+
+  @@unique([UID, ReportType, ReportCode, GenerationDate, Version], map: "IX_TrendReport_ContentsInfo_Week_Composite", clustered: true)
+}
+
+model TrendReport_CustomPushMessage {
+  ID                            Int                             @id(map: "PK_TrendReport_CustomPushMessage")
+  MessageType                   String                          @db.NVarChar(50)
+  SubType                       String                          @db.NVarChar(100)
+  Title                         String                          @db.NVarChar(300)
+  Contents                      String                          @db.NVarChar(500)
+  Condition                     String?
+  CreateUTC                     DateTime                        @default(now(), map: "DEFAULT_TrendReport_CustomPushMessage_CreateUTC") @db.DateTime
+  UpdateUTC                     DateTime                        @default(now(), map: "DEFAULT_TrendReport_CustomPushMessage_UpdateUTC") @db.DateTime
+  TrendReport_PushMessageTarget TrendReport_PushMessageTarget[]
+}
+
+model TrendReport_FeedbackAnswerLoggingInfo_ {
+  AnswerKey                        Int
+  CreateUTC                        DateTime                        @default(now(), map: "DF_TrendReport_FeedbackAnswerLoggingInfo_CreateUTC") @db.DateTime
+  UpdateUTC                        DateTime                        @default(now(), map: "DF_TrendReport_FeedbackAnswerLoggingInfo_UpdateUTC") @db.DateTime
+  SubjectiveAnswerValue            String?                         @db.NVarChar(Max)
+  AdditionalAnswerValue            String?                         @db.NVarChar(50)
+  TrendReport_ContentsInfo_Week_ID BigInt
+  TrendReport_ContentsInfo_Week    TrendReport_ContentsInfo_Week   @relation(fields: [TrendReport_ContentsInfo_Week_ID], references: [ID], onDelete: Cascade, map: "FK_TrendReport_ContentsInfo_Week_TrendReport_FeedbackAnswerLoggingInfo")
+  TrendReport_FeedbackChoicesInfo  TrendReport_FeedbackChoicesInfo @relation(fields: [AnswerKey], references: [AnswerKey], onDelete: Cascade, map: "FK_TrendReport_FeedbackChoicesInfo_TrendReport_FeedbackAnswerLoggingInfo")
+
+  @@id([AnswerKey, TrendReport_ContentsInfo_Week_ID], map: "PK_TrendReport_FeedbackAnswerLoggingInfo")
+  @@map("TrendReport_FeedbackAnswerLoggingInfo ")
+}
+
+model TrendReport_FeedbackChoicesInfo {
+  AnswerKey                              Int                                      @id(clustered: false, map: "PK_TrendReport_FeedbackChoicesInfo")
+  IsPositive                             Boolean
+  AnswerValue                            String                                   @db.NVarChar(50)
+  IsForNonChoice                         Boolean                                  @default(false, map: "DF__TrendRepo__IsFor__14017D17")
+  UserCount                              Int                                      @default(0, map: "DEFAULT_TrendReport_FeedbackChoicesInfo_UserCount")
+  IsShow                                 Boolean
+  CreateUTC                              DateTime                                 @default(dbgenerated("getutcdate()"), map: "DEFAULT_TrendReport_FeedbackChoicesInfo_CreateUTC") @db.DateTime
+  UpdateUTC                              DateTime                                 @default(dbgenerated("getutcdate()"), map: "DEFAULT_TrendReport_FeedbackChoicesInfo_UpdateUTC") @db.DateTime
+  Priority                               Int                                      @default(-1, map: "DF__TrendRepo__Prior__1E7F0B8A")
+  IsForSubjective                        Boolean                                  @default(false, map: "DF__TrendRepo__IsFor__3191DFFE")
+  TrendReport_FeedbackAnswerLoggingInfo_ TrendReport_FeedbackAnswerLoggingInfo_[]
+
+  @@index([AnswerKey, IsPositive], map: "CX_TrendReport_FeedbackChoicesInfo", clustered: true)
+}
+
+model TrendReport_PublishTrackingCardContents {
+  ID        Int      @id(map: "PK_TrendReport_PublishTrackingCardContents") @default(autoincrement())
+  Section1  Boolean?
+  Section2  Boolean?
+  Section3  Boolean?
+  Section4  Boolean?
+  Title     String?  @db.NVarChar(Max)
+  Body      String?  @db.NVarChar(Max)
+  CreateUTC DateTime @default(now(), map: "DF_TrendReport_PublishTrackingCardContents_CreateUTC") @db.DateTime
+  UpdateUTC DateTime @default(now(), map: "DF_TrendReport_PublishTrackingCardContents_UpdateUTC") @db.DateTime
+}
+
+model TrendReport_PushMessageTarget {
+  ID                               Int                            @id(map: "PK_TrendReport_PushMessageTarget") @default(autoincrement())
+  UID                              BigInt
+  TrendReport_ContentsInfo_Week_ID BigInt?
+  CustomPushMessageID              Int?
+  PrivateNotificationID            BigInt?
+  Title                            String                         @db.NVarChar(50)
+  CreateUTC                        DateTime                       @default(now(), map: "DF_TrendReport_PushMessageTarget_CreateUTC") @db.DateTime
+  UpdateUTC                        DateTime                       @default(now(), map: "DF_TrendReport_PushMessageTarget_UpdateUTC") @db.DateTime
+  Body                             String                         @db.NVarChar(300)
+  Notification_PrivateHistory      Notification_PrivateHistory?   @relation(fields: [PrivateNotificationID], references: [NotificationID], onUpdate: NoAction, map: "FK_Notification_PrivateHistory_TrendReport_PushMessageTarget")
+  TrendReport_ContentsInfo_Week    TrendReport_ContentsInfo_Week? @relation(fields: [TrendReport_ContentsInfo_Week_ID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_TrendReport_ContentsInfo_Week_TrendReport_PushMessageTarget")
+  TrendReport_CustomPushMessage    TrendReport_CustomPushMessage? @relation(fields: [CustomPushMessageID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_TrendReport_CustomPushMessage_TrendReport_PushMessageTarget")
+}
+
+model user_allergy {
+  id               Int              @id(map: "PK_user_allergy") @default(autoincrement())
+  UID              BigInt
+  allergy          String           @db.NVarChar(20)
+  created_at       DateTime         @default(dbgenerated("getutcdate()"), map: "DEFAULT_user_allergy_created_at") @db.DateTime
+  Profile_UserInfo Profile_UserInfo @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_user_allergy_Profile_UserInfo")
+}
+
+model user_diet {
+  id                  BigInt           @id(map: "PK_user_diet") @default(autoincrement())
+  UID                 BigInt
+  date                DateTime         @db.Date
+  meal                String           @db.NVarChar(10)
+  representative_name String?          @db.NVarChar(100)
+  foods               String           @db.NVarChar(4000)
+  evaluation          String           @db.NVarChar(100)
+  total_calories      Int?
+  created_at          DateTime         @default(dbgenerated("getutcdate()"), map: "DEFAULT_user_diet_created_at") @db.DateTime
+  updated_at          DateTime         @default(dbgenerated("getutcdate()"), map: "DEFAULT_user_diet_updated_at") @db.DateTime
+  image_urls          String           @default("[]", map: "DEFAULT_user_diet_image_urls") @db.NVarChar(200)
+  Profile_UserInfo    Profile_UserInfo @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_user_diet_Profile_UserInfo")
+}
+
+model user_disease {
+  id               Int              @id(map: "PK_user_ disease") @default(autoincrement())
+  UID              BigInt
+  disease          String           @db.NVarChar(20)
+  created_at       DateTime         @default(dbgenerated("getutcdate()"), map: "DEFAULT_user_ disease_created_at") @db.DateTime
+  Profile_UserInfo Profile_UserInfo @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_user_ disease_Profile_UserInfo")
+}
+
+model user_exercise {
+  id               BigInt           @id(map: "PK_user_exercise_demo") @default(autoincrement())
+  UID              BigInt
+  name             String           @db.NVarChar(100)
+  time             Int?
+  met              Float?
+  intensity        String?          @db.NVarChar(50)
+  weight           Float
+  calories         Float
+  type             String           @db.NVarChar(50)
+  timestamp        DateTime         @db.DateTime
+  created_at       DateTime?        @db.DateTime
+  Profile_UserInfo Profile_UserInfo @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_user_exercise_Profile_UserInfo")
+}
+
+model user_goal_from_chat {
+  id               Int              @id(map: "PK_user_goal_from_chat") @default(autoincrement())
+  UID              BigInt
+  WT               Float?           @db.Real
+  PBF              Float?           @db.Real
+  SMM              Float?           @db.Real
+  created_at       DateTime         @default(dbgenerated("getutcdate()"), map: "DF__user_goal__creat__469EAC57") @db.DateTimeOffset
+  updated_at       DateTime         @default(dbgenerated("getutcdate()"), map: "DF__user_goal__updat__7CE8423E") @db.DateTimeOffset
+  Profile_UserInfo Profile_UserInfo @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_user_goal_from_chat_Profile_UserInfo")
+}
+
+model user_sleep {
+  id               BigInt           @id(map: "PK_user_sleep") @default(autoincrement())
+  UID              BigInt
+  hours            Int
+  created_at       DateTime         @default(dbgenerated("getutcdate()"), map: "DEFAULT_user_sleep_created_at") @db.DateTime
+  updated_at       DateTime         @default(dbgenerated("getutcdate()"), map: "DEFAULT_user_sleep_updated_at") @db.DateTime
+  Profile_UserInfo Profile_UserInfo @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_user_sleep_Profile_UserInfo")
+}
+
+model user_traits {
+  id               Int              @id(map: "PK_user_traits") @default(autoincrement())
+  UID              BigInt
+  is_smoke         Boolean?
+  is_drink         Boolean?
+  created_at       DateTime         @default(dbgenerated("getutcdate()"), map: "DEFAULT_user_traits_created_at") @db.DateTime
+  updated_at       DateTime         @default(dbgenerated("getutcdate()"), map: "DEFAULT_user_traits_updated_at") @db.DateTime
+  Profile_UserInfo Profile_UserInfo @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_user_traits_Profile_UserInfo")
+}
+
+model user_water_intake {
+  id               BigInt           @id(map: "PK_user_water_intake") @default(autoincrement())
+  UID              BigInt
+  amount           Int
+  created_at       DateTime         @default(dbgenerated("getutcdate()"), map: "DEFAULT_user_water_intake_created_at") @db.DateTime
+  updated_at       DateTime         @default(dbgenerated("getutcdate()"), map: "DEFAULT_user_water_intake_updated_at") @db.DateTime
+  Profile_UserInfo Profile_UserInfo @relation(fields: [UID], references: [UID], onDelete: Cascade, map: "FK_user_water_intake_Profile_UserInfo")
 }

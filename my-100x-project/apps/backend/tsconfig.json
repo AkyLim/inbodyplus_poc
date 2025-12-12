@@ -11,6 +11,21 @@
         "outDir": "./dist",
         "baseUrl": "./",
         "incremental": true,
-        "skipLibCheck": true
-    }
+        "skipLibCheck": true,
+        "strictNullChecks": false,
+        "noImplicitAny": false,
+        "strictBindCallApply": false,
+        "forceConsistentCasingInFileNames": false,
+        "noFallthroughCasesInSwitch": false,
+        "paths": {
+            "@repo/schema": [
+                "../../packages/shared-schema/index.ts"
+            ]
+        }
+    },
+    "exclude": [
+        "node_modules",
+        "dist",
+        "**/*.spec.ts"
+    ]
 }

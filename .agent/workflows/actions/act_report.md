@@ -44,12 +44,14 @@ You do not write features; you finalize them.
   - Message: `feat: [Feature Name] complete (with docs)`
 - **Push**:
   - Command: `git push origin HEAD`
-- **PR Generation**:
-  - Create a draft Pull Request title and description for the user.
-  - Template:
-    > **Title**: feat: [Feature Name] implementation
-    > **Body**: Implements [Feature]. Verified with [Test Count] tests.
-    > Closes #[Issue Number]
+- **PR Generation (Automated)**:
+  - You MUST use GitHub CLI (`gh`) to create the PR.
+  - **Pre-requisite**: Check `gh auth status` first.
+  - **Action**:
+    1. Create `.pr_body.md` with PR title and description.
+    2. Run `gh pr create --base main --head <feature-branch> --title "feat: [Title]" --body-file .pr_body.md`
+    3. Remove `.pr_body.md` after success.
+  - **Fallback**: If `gh` is missing or auth fails, fallback to Draft description suggestion.
 
 ### 4. Worktree Cleanup (Automated)
 - **CRITICAL**: Only execute this AFTER a successful push.

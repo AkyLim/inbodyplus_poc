@@ -74,8 +74,19 @@ export class PrismaUserRepository implements UserRepository {
 
         return {
             id: entity.UID.toString(),
+            loginId: entity.LoginID,
             email: entity.Email,
+            phoneNumber: entity.PhoneNumber,
+            countryCode: entity.CountryCode,
+            profileType: entity.ProfileType,
+            gender: entity.Gender,
+            birthDay: entity.BirthDay,
+            height: entity.Height,
             name: entity.Name,
+            profileImgUrl: entity.ProfileIMG_URL,
+            createAccountDate: entity.CreateAccountDate,
+            recentMeasureDate: entity.RecentMeasureDate,
+            recentLoginDate: entity.RecentLoginDate,
             role: 'USER', // DB에 Role 컬럼이 없으므로 기본값
             createdAt: entity.CreateUTC,
             updatedAt: entity.ModifyUTC,

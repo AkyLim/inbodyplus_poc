@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "scripts": {
-    "dev": "npx nest start --watch",
+    "dev": "dotenv -e .env -- npx nest start --watch",
     "test": "jest"
   },
   "dependencies": {
@@ -23,6 +23,7 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^20.0.0",
     "@types/uuid": "^9.0.0",
+    "dotenv-cli": "^11.0.0",
     "jest": "^30.2.0",
     "prisma": "^5.14.0",
     "ts-jest": "^29.4.6"

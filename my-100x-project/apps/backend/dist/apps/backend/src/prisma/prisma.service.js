@@ -12,29 +12,34 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UsersService = void 0;
+exports.PrismaService = void 0;
 const common_1 = require("@nestjs/common");
-const user_repository_1 = require("./domain/user.repository");
-let UsersService = class UsersService {
-    constructor(userRepository) {
-        this.userRepository = userRepository;
+const client_1 = require("@prisma/client");
+const database_config_interface_1 = require("../config/database.config.interface");
+let PrismaService = class PrismaService extends client_1.PrismaClient {
+    constructor(dbConfig) {
+        super({
+            datasources: {
+                db: {
+                    url: dbConfig.connectionUrl,
+                },
+            },
+        });
+        this.dbConfig = dbConfig;
     }
-    async create(createUserDto) {
-        return this.userRepository.create(createUserDto);
+    async onModuleInit() {
+        console.log(`[PrismaService] Connecting to ${this.dbConfig.environment} database...`);
+        await this.$connect();
+        console.log(`[PrismaService] Connected successfully!`);
     }
-    async findOne(email) {
-        const user = await this.userRepository.findByEmail(email);
-        return user || undefined;
-    }
-    async findById(id) {
-        const user = await this.userRepository.findById(id);
-        return user || undefined;
+    async onModuleDestroy() {
+        await this.$disconnect();
     }
 };
-exports.UsersService = UsersService;
-exports.UsersService = UsersService = __decorate([
+exports.PrismaService = PrismaService;
+exports.PrismaService = PrismaService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, common_1.Inject)(user_repository_1.UserRepository)),
+    __param(0, (0, common_1.Inject)(database_config_interface_1.DATABASE_CONFIG)),
     __metadata("design:paramtypes", [Object])
-], UsersService);
-//# sourceMappingURL=users.service.js.map
+], PrismaService);
+//# sourceMappingURL=prisma.service.js.map

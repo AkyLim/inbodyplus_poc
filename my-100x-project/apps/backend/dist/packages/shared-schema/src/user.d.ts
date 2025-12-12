@@ -86,6 +86,7 @@ export declare const UserResponseSchema: z.ZodObject<{
     recentMeasureDate: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     recentLoginDate: z.ZodOptional<z.ZodNullable<z.ZodString>>;
 }, "strip", z.ZodTypeAny, {
+    name?: string;
     id?: string;
     email?: string;
     phoneNumber?: string;
@@ -95,12 +96,12 @@ export declare const UserResponseSchema: z.ZodObject<{
     countryCode?: string;
     profileType?: string;
     birthDay?: string;
-    name?: string;
     profileImgUrl?: string;
     createAccountDate?: string;
     recentMeasureDate?: string;
     recentLoginDate?: string;
 }, {
+    name?: string;
     id?: string;
     email?: string;
     phoneNumber?: string;
@@ -110,7 +111,6 @@ export declare const UserResponseSchema: z.ZodObject<{
     countryCode?: string;
     profileType?: string;
     birthDay?: string;
-    name?: string;
     profileImgUrl?: string;
     createAccountDate?: string;
     recentMeasureDate?: string;

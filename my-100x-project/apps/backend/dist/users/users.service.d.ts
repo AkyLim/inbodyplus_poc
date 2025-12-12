@@ -1,10 +1,10 @@
-import { PrismaService } from '../prisma/prisma.service';
+import { CreateUserDto } from '../shared';
+import { UserRepository } from './domain/user.repository';
+import { User } from './domain/user.model';
 export declare class UsersService {
-    private readonly prisma;
-    constructor(prisma: PrismaService);
-    findOne(uid: string): Promise<any>;
-    create(createUserDto: any): string;
-    findAll(): string;
-    update(id: number, updateUserDto: any): string;
-    remove(id: number): string;
+    private readonly userRepository;
+    constructor(userRepository: UserRepository);
+    create(createUserDto: CreateUserDto): Promise<User>;
+    findOne(email: string): Promise<User | undefined>;
+    findById(id: string): Promise<User | undefined>;
 }

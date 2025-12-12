@@ -23,4 +23,6 @@ lerna-debug.log*
 .vscode
 *.swp
 *.swo
-.worktrees/
+
+# Build cache
+.turbo/

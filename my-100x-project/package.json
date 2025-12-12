@@ -7,8 +7,9 @@
     "lint": "turbo run lint"
   },
   "devDependencies": {
-    "turbo": "latest",
+    "dotenv-cli": "^11.0.0",
     "prettier": "latest",
+    "turbo": "latest",
     "typescript": "latest"
   },
   "packageManager": "pnpm@9.15.0"
